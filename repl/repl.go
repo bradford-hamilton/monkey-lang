@@ -11,7 +11,7 @@ import (
 
 const prompt = "> "
 
-// Start - starts REPL, passes input into lexer line by line
+// Start - starts REPL, passes stdin to lexer line by line
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 
