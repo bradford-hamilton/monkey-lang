@@ -6,7 +6,7 @@ const (
 
 	// Identifiers & literals
 	IDENTIFIER = "IDENTIFIER" // add, foobar, x, y, ...
-	NUMBER     = "NUMBER"     // 1, 2, 3, 4, 5
+	NUMBER     = "NUMBER"
 
 	// Operators
 	EQUAL         = "="
@@ -56,7 +56,7 @@ var keywords = map[string]TokenType{
 }
 
 // LookupIdentifier checks our keywords map for the scanned keyword. If it finds one, then
-// the keywords TokenType is returned. If not the user defined IDENTIFIER is returned
+// the keywords TokenType is returned. If not, the user defined IDENTIFIER is returned
 func LookupIdentifier(identifier string) TokenType {
 	if token, ok := keywords[identifier]; ok {
 		return token
