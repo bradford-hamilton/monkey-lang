@@ -30,41 +30,121 @@ func (l *Lexer) readChar() {
 	l.readPosition++
 }
 
-// NextToken switches through the lexer's current char and creates a new token.
-// It then it calls readChar() to advance the lexer and it returns the token
-func (l *Lexer) NextToken() token.Token {
-	var t token.Token
-
-	switch l.char {
-	case '=':
-		t = newToken(token.ASSIGN, l.char)
-	case ';':
-		t = newToken(token.SEMICOLON, l.char)
-	case '(':
-		t = newToken(token.LPAREN, l.char)
-	case ')':
-		t = newToken(token.RPAREN, l.char)
-	case ',':
-		t = newToken(token.COMMA, l.char)
-	case '+':
-		t = newToken(token.PLUS, l.char)
-	case '{':
-		t = newToken(token.LBRACE, l.char)
-	case '}':
-		t = newToken(token.RBRACE, l.char)
-	case 0:
-		t.Literal = ""
-		t.Type = token.EOF
-	}
-
-	l.readChar()
-
-	return t
-}
-
 func newToken(tokenType token.TokenType, char byte) token.Token {
 	return token.Token{
 		Type:    tokenType,
 		Literal: string(char),
 	}
+}
+
+func isLetter(char byte) bool {
+	return 'a' <= char && char <= 'z' || 'A' <= char && char <= 'Z' || char == '_'
+}
+
+func isNumber(char byte) bool {
+	return '0' <= char && char <= '9'
+}
+
+func (l *Lexer) readIdentifier() string {
+	position := l.position
+
+	for isLetter(l.char) {
+		l.readChar()
+	}
+
+	return l.input[position:l.position]
+}
+
+func (l *Lexer) readNumber() string {
+	position := l.position
+
+	for isNumber(l.char) {
+		l.readChar()
+	}
+
+	return l.input[position:l.position]
+}
+
+func (l *Lexer) skipWhitespace() {
+	for l.char == ' ' || l.char == '\t' || l.char == '\n' || l.char == '\r' {
+		l.readChar()
+	}
+}
+
+func (l *Lexer) peek() byte {
+	if l.readPosition >= len(l.input) {
+		return 0
+	}
+	return l.input[l.readPosition]
+}
+
+// NextToken switches through the lexer's current char and creates a new token.
+// It then it calls readChar() to advance the lexer and it returns the token
+func (l *Lexer) NextToken() token.Token {
+	var t token.Token
+
+	l.skipWhitespace()
+
+	switch l.char {
+	case '=':
+		if l.peek() == '=' {
+			ch := l.char
+			l.readChar()
+			literal := string(ch) + string(l.char)
+			t = token.Token{Type: token.EQUAL_EQUAL, Literal: literal}
+		} else {
+			t = newToken(token.EQUAL, l.char)
+		}
+	case '+':
+		t = newToken(token.PLUS, l.char)
+	case '-':
+		t = newToken(token.MINUS, l.char)
+	case '!':
+		if l.peek() == '=' {
+			ch := l.char
+			l.readChar()
+			literal := string(ch) + string(l.char)
+			t = token.Token{Type: token.BANG_EQUAL, Literal: literal}
+		} else {
+			t = newToken(token.BANG, l.char)
+		}
+	case '*':
+		t = newToken(token.STAR, l.char)
+	case '/':
+		t = newToken(token.SLASH, l.char)
+	case '<':
+		t = newToken(token.LESS_EQUAL, l.char)
+	case '>':
+		t = newToken(token.GREATER_EQUAL, l.char)
+	case ',':
+		t = newToken(token.COMMA, l.char)
+	case ';':
+		t = newToken(token.SEMICOLON, l.char)
+	case '(':
+		t = newToken(token.LEFT_PAREN, l.char)
+	case ')':
+		t = newToken(token.RIGHT_PAREN, l.char)
+	case '{':
+		t = newToken(token.LEFT_BRACE, l.char)
+	case '}':
+		t = newToken(token.RIGHT_BRACE, l.char)
+	case 0:
+		t.Literal = ""
+		t.Type = token.EOF
+	default:
+		if isLetter(l.char) {
+			t.Literal = l.readIdentifier()
+			t.Type = token.LookupIdentifier(t.Literal)
+			return t
+		} else if isNumber(l.char) {
+			t.Literal = l.readNumber()
+			t.Type = token.NUMBER
+			return t
+		} else {
+			t = newToken(token.ILLEGAL, l.char)
+		}
+	}
+
+	l.readChar()
+	return t
 }
