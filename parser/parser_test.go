@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/bradford-hamilton/monkey-lang/ast"
@@ -85,7 +86,7 @@ func TestIdentifierExpression(t *testing.T) {
 
 	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
 	if !ok {
-		t.Fatalf("program.Statements[0] is not an ast.ExpressionStatement. Got: %T", program.Statements[0])
+		t.Fatalf("program.Statements[0] is not an *ast.ExpressionStatement. Got: %T", program.Statements[0])
 	}
 
 	ident, ok := stmt.Expression.(*ast.Identifier)
@@ -114,7 +115,7 @@ func TestIntegerLiteralExpression(t *testing.T) {
 
 	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
 	if !ok {
-		t.Fatalf("program.Statements[0] is not an ast.ExpressionStatement. Got: %T", program.Statements[0])
+		t.Fatalf("program.Statements[0] is not an *ast.ExpressionStatement. Got: %T", program.Statements[0])
 	}
 
 	literal, ok := stmt.Expression.(*ast.IntegerLiteral)
@@ -127,6 +128,62 @@ func TestIntegerLiteralExpression(t *testing.T) {
 	if literal.TokenLiteral() != "5" {
 		t.Errorf("literal.TokenLiteral() not %s. Got: %s", "5", literal.TokenLiteral())
 	}
+}
+
+func TestParsingPrefixExpressions(t *testing.T) {
+	prefixTests := []struct {
+		input        string
+		operator     string
+		integerValue int64
+	}{
+		{"!5;", "!", 5},
+		{"-15", "-", 15},
+	}
+
+	for _, tt := range prefixTests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statements does not contain %d statements. Got: %d", 1, len(program.Statements))
+		}
+
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not an *ast.ExpressionStatement. Got: %T", program.Statements[0])
+		}
+
+		prefixExpr, ok := stmt.Expression.(*ast.PrefixExpression)
+		if !ok {
+			t.Fatalf("stmt is not an *ast.PrefixExpression. Got: %T", stmt.Expression)
+		}
+		if prefixExpr.Operator != tt.operator {
+			t.Fatalf("expr.Operator is not '%s'. Got: %s", tt.operator, prefixExpr.Operator)
+		}
+		if !testIntegerLiteral(t, prefixExpr.Right, tt.integerValue) {
+			return
+		}
+	}
+}
+
+func testIntegerLiteral(t *testing.T, intLiteral ast.Expression, value int64) bool {
+	integer, ok := intLiteral.(*ast.IntegerLiteral)
+	if !ok {
+		t.Errorf("intLiteral not an *ast.IntegerLiteral. Got: %T", intLiteral)
+		return false
+	}
+	if integer.Value != value {
+		t.Errorf("integer.Value not %d. Got: %d", value, integer.Value)
+		return false
+	}
+	if integer.TokenLiteral() != fmt.Sprintf("%d", value) {
+		t.Errorf("integer.TokenLiteral() not %d. Got: %s", value, integer.TokenLiteral())
+		return false
+	}
+
+	return true
 }
 
 func checkParserErrors(t *testing.T, p *Parser) {
