@@ -9,6 +9,7 @@ import (
 	"github.com/bradford-hamilton/monkey-lang/token"
 )
 
+// Define operator precedence
 const (
 	LOWEST      = iota + 1
 	EQUALS      // ==
