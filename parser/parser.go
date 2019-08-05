@@ -2,18 +2,38 @@ package parser
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/bradford-hamilton/monkey-lang/ast"
 	"github.com/bradford-hamilton/monkey-lang/lexer"
 	"github.com/bradford-hamilton/monkey-lang/token"
 )
 
+const (
+	LOWEST      = iota + 1
+	EQUALS      // ==
+	LESSGREATER // > or <
+	SUM         // +
+	PRODUCT     // *
+	PREFIX      // -x or !x
+	CALL        // myFunction(x)
+)
+
+type (
+	prefixParseFunc func() ast.Expression
+	infixParseFunc  func(ast.Expression) ast.Expression
+)
+
 // Parser holds a Lexer, the currentToken, and the peekToken
 type Parser struct {
-	lexer        *lexer.Lexer
-	errors       []string
+	lexer  *lexer.Lexer
+	errors []string
+
 	currentToken token.Token
 	peekToken    token.Token
+
+	prefixParseFuncs map[token.TokenType]prefixParseFunc
+	infixParseFuncs  map[token.TokenType]infixParseFunc
 }
 
 // New takes a Lexer, creates a Parser with that Lexer, sets the current and
@@ -24,11 +44,39 @@ func New(l *lexer.Lexer) *Parser {
 		errors: []string{},
 	}
 
+	p.prefixParseFuncs = make(map[token.TokenType]prefixParseFunc)
+	p.registerPrefix(token.IDENTIFIER, p.parseIdentifier)
+	p.registerPrefix(token.NUMBER, p.parseIntegerLiteral)
+
 	// Read two tokens, so currentToken and peekToken are both set.
 	p.nextToken()
 	p.nextToken()
 
 	return p
+}
+
+// ParseProgram parses tokens and creates an AST. It returns the RootNode
+// which holds a slice of Statements (and in turn, the rest of the tree)
+func (p *Parser) ParseProgram() *ast.RootNode {
+	rootNode := &ast.RootNode{}
+	rootNode.Statements = []ast.Statement{}
+
+	for !p.currentTokenTypeIs(token.EOF) {
+		stmt := p.parseStatement()
+		if stmt != nil {
+			rootNode.Statements = append(rootNode.Statements, stmt)
+		}
+		p.nextToken()
+	}
+
+	return rootNode
+}
+
+func (p *Parser) parseIdentifier() ast.Expression {
+	return &ast.Identifier{
+		Token: p.currentToken,
+		Value: p.currentToken.Literal,
+	}
 }
 
 func (p *Parser) nextToken() {
@@ -101,6 +149,43 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	return stmt
 }
 
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+	stmt := &ast.ExpressionStatement{Token: p.currentToken}
+
+	stmt.Expression = p.parseExpression(LOWEST)
+
+	if p.peekTokenTypeIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) parseExpression(precedence int) ast.Expression {
+	prefix := p.prefixParseFuncs[p.currentToken.Type]
+	if prefix == nil {
+		return nil
+	}
+	leftExpr := prefix()
+
+	return leftExpr
+}
+
+func (p *Parser) parseIntegerLiteral() ast.Expression {
+	lit := &ast.IntegerLiteral{Token: p.currentToken}
+
+	value, err := strconv.ParseInt(p.currentToken.Literal, 0, 64)
+	if err != nil {
+		msg := fmt.Sprintf("Could not parse %q as integer", p.currentToken.Literal)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+
+	lit.Value = value
+
+	return lit
+}
+
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.currentToken.Type {
 	case token.LET:
@@ -108,23 +193,14 @@ func (p *Parser) parseStatement() ast.Statement {
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default:
-		return nil
+		return p.parseExpressionStatement()
 	}
 }
 
-// ParseProgram parses tokens and creates an AST. It returns the RootNode
-// which holds a slice of Statements (and in turn, the rest of the tree)
-func (p *Parser) ParseProgram() *ast.RootNode {
-	rootNode := &ast.RootNode{}
-	rootNode.Statements = []ast.Statement{}
+func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFunc) {
+	p.prefixParseFuncs[tokenType] = fn
+}
 
-	for !p.currentTokenTypeIs(token.EOF) {
-		stmt := p.parseStatement()
-		if stmt != nil {
-			rootNode.Statements = append(rootNode.Statements, stmt)
-		}
-		p.nextToken()
-	}
-
-	return rootNode
+func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFunc) {
+	p.infixParseFuncs[tokenType] = fn
 }
