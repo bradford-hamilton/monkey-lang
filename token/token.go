@@ -6,7 +6,7 @@ const (
 
 	// Identifiers & literals
 	IDENTIFIER = "IDENTIFIER" // add, foobar, x, y, ...
-	NUMBER     = "NUMBER"
+	INTEGER    = "INTEGER"
 
 	// Operators
 	EQUAL         = "="
