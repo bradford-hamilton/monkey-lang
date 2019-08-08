@@ -20,9 +20,14 @@ func Eval(node ast.Node) object.Object {
 
 	// Statements
 	case *ast.RootNode:
-		return evalStatements(node.Statements)
+		return evalRootNode(node)
+	case *ast.BlockStatement:
+		return evalBlockStatement(node)
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression)
+	case *ast.ReturnStatement:
+		val := Eval(node.ReturnValue)
+		return &object.ReturnValue{Value: val}
 
 	// Expressions
 	case *ast.IntegerLiteral:
@@ -36,16 +41,36 @@ func Eval(node ast.Node) object.Object {
 		left := Eval(node.Left)
 		right := Eval(node.Right)
 		return evalInfixExpr(node.Operator, left, right)
+	case *ast.IfExpression:
+		return evalIfExpr(node)
 	}
 
 	return nil
 }
 
-func evalStatements(stmts []ast.Statement) object.Object {
+func evalRootNode(rootNode *ast.RootNode) object.Object {
 	var result object.Object
 
-	for _, stmt := range stmts {
+	for _, stmt := range rootNode.Statements {
 		result = Eval(stmt)
+
+		if returnValue, ok := result.(*object.ReturnValue); ok {
+			return returnValue.Value
+		}
+	}
+
+	return result
+}
+
+func evalBlockStatement(block *ast.BlockStatement) object.Object {
+	var result object.Object
+
+	for _, stmt := range block.Statements {
+		result = Eval(stmt)
+
+		if result != nil && result.Type() == object.ReturnValueObj {
+			return result
+		}
 	}
 
 	return result
@@ -103,6 +128,31 @@ func evalInfixExpr(operator string, left, right object.Object) object.Object {
 		return nativeBoolToBooleanObj(left != right)
 	default:
 		return Null
+	}
+}
+
+func evalIfExpr(ifExpr *ast.IfExpression) object.Object {
+	condition := Eval(ifExpr.Condition)
+
+	if isTruthy(condition) {
+		return Eval(ifExpr.Consequence)
+	} else if ifExpr.Alternative != nil {
+		return Eval(ifExpr.Alternative)
+	} else {
+		return Null
+	}
+}
+
+func isTruthy(obj object.Object) bool {
+	switch obj {
+	case Null:
+		return false
+	case True:
+		return true
+	case False:
+		return false
+	default:
+		return true
 	}
 }
 
