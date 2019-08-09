@@ -1,6 +1,8 @@
 package evaluator
 
 import (
+	"fmt"
+
 	"github.com/bradford-hamilton/monkey-lang/ast"
 	"github.com/bradford-hamilton/monkey-lang/object"
 )
@@ -15,19 +17,28 @@ var (
 
 // Eval takes an ast.Node (starting with the RootNode) and traverses the AST.
 // It switches on the node's type and recursively evaluates them appropriately
-func Eval(node ast.Node) object.Object {
+func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch node := node.(type) {
 
 	// Statements
 	case *ast.RootNode:
-		return evalRootNode(node)
+		return evalRootNode(node, env)
 	case *ast.BlockStatement:
-		return evalBlockStatement(node)
+		return evalBlockStmt(node, env)
 	case *ast.ExpressionStatement:
-		return Eval(node.Expression)
+		return Eval(node.Expression, env)
 	case *ast.ReturnStatement:
-		val := Eval(node.ReturnValue)
+		val := Eval(node.ReturnValue, env)
+		if isError(val) {
+			return val
+		}
 		return &object.ReturnValue{Value: val}
+	case *ast.LetStatement:
+		val := Eval(node.Value, env)
+		if isError(val) {
+			return val
+		}
+		env.Set(node.Name.Value, val)
 
 	// Expressions
 	case *ast.IntegerLiteral:
@@ -35,41 +46,58 @@ func Eval(node ast.Node) object.Object {
 	case *ast.Boolean:
 		return nativeBoolToBooleanObj(node.Value)
 	case *ast.PrefixExpression:
-		right := Eval(node.Right)
+		right := Eval(node.Right, env)
+		if isError(right) {
+			return right
+		}
 		return evalPrefixExpr(node.Operator, right)
 	case *ast.InfixExpression:
-		left := Eval(node.Left)
-		right := Eval(node.Right)
+		left := Eval(node.Left, env)
+		if isError(left) {
+			return left
+		}
+		right := Eval(node.Right, env)
+		if isError(right) {
+			return right
+		}
 		return evalInfixExpr(node.Operator, left, right)
 	case *ast.IfExpression:
-		return evalIfExpr(node)
+		return evalIfExpr(node, env)
+	case *ast.Identifier:
+		return evalIdentifier(node, env)
 	}
 
 	return nil
 }
 
-func evalRootNode(rootNode *ast.RootNode) object.Object {
+func evalRootNode(rootNode *ast.RootNode, env *object.Environment) object.Object {
 	var result object.Object
 
 	for _, stmt := range rootNode.Statements {
-		result = Eval(stmt)
+		result = Eval(stmt, env)
 
-		if returnValue, ok := result.(*object.ReturnValue); ok {
-			return returnValue.Value
+		switch result := result.(type) {
+		case *object.ReturnValue:
+			return result.Value
+		case *object.Error:
+			return result
 		}
 	}
 
 	return result
 }
 
-func evalBlockStatement(block *ast.BlockStatement) object.Object {
+func evalBlockStmt(block *ast.BlockStatement, env *object.Environment) object.Object {
 	var result object.Object
 
 	for _, stmt := range block.Statements {
-		result = Eval(stmt)
+		result = Eval(stmt, env)
 
-		if result != nil && result.Type() == object.ReturnValueObj {
-			return result
+		if result != nil {
+			rt := result.Type()
+			if rt == object.ReturnValueObj || rt == object.ErrorObj {
+				return result
+			}
 		}
 	}
 
@@ -91,7 +119,7 @@ func evalPrefixExpr(operator string, right object.Object) object.Object {
 	case "-":
 		return evalMinusPrefixOperatorExpr(right)
 	default:
-		return Null
+		return newError("Unknown operator: %s%s", operator, right.Type())
 	}
 }
 
@@ -110,7 +138,7 @@ func evalBangOperatorExpr(right object.Object) object.Object {
 
 func evalMinusPrefixOperatorExpr(right object.Object) object.Object {
 	if right.Type() != object.IntegerObj {
-		return Null
+		return newError("Unknown operator: -%s", right.Type())
 	}
 
 	value := right.(*object.Integer).Value
@@ -126,18 +154,24 @@ func evalInfixExpr(operator string, left, right object.Object) object.Object {
 		return nativeBoolToBooleanObj(left == right)
 	case operator == "!=":
 		return nativeBoolToBooleanObj(left != right)
+	case left.Type() != right.Type():
+		return newError("Type mismatch: %s %s %s", left.Type(), operator, right.Type())
 	default:
-		return Null
+		fmt.Printf("%s %s %s", left.Type(), operator, right.Type())
+		return newError("Unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
 }
 
-func evalIfExpr(ifExpr *ast.IfExpression) object.Object {
-	condition := Eval(ifExpr.Condition)
+func evalIfExpr(ifExpr *ast.IfExpression, env *object.Environment) object.Object {
+	condition := Eval(ifExpr.Condition, env)
+	if isError(condition) {
+		return condition
+	}
 
 	if isTruthy(condition) {
-		return Eval(ifExpr.Consequence)
+		return Eval(ifExpr.Consequence, env)
 	} else if ifExpr.Alternative != nil {
-		return Eval(ifExpr.Alternative)
+		return Eval(ifExpr.Alternative, env)
 	} else {
 		return Null
 	}
@@ -178,6 +212,26 @@ func evalIntegerInfixExpr(operator string, left, right object.Object) object.Obj
 	case "!=":
 		return nativeBoolToBooleanObj(leftVal != rightVal)
 	default:
-		return Null
+		return newError("Unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
+}
+
+func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
+	val, ok := env.Get(node.Value)
+	if !ok {
+		return newError("Identifier not found: " + node.Value)
+	}
+
+	return val
+}
+
+func newError(msgWithFormatVerbs string, values ...interface{}) *object.Error {
+	return &object.Error{Message: fmt.Sprintf(msgWithFormatVerbs, values...)}
+}
+
+func isError(obj object.Object) bool {
+	if obj != nil {
+		return obj.Type() == object.ErrorObj
+	}
+	return false
 }

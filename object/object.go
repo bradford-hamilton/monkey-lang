@@ -72,3 +72,26 @@ func (e *Error) Type() ObjectType { return ErrorObj }
 
 // Inspect returns an error message string
 func (e *Error) Inspect() string { return "Error: " + e.Message }
+
+// NewEnvironment creates and returns a pointer to an Environment
+func NewEnvironment() *Environment {
+	s := make(map[string]Object)
+	return &Environment{store: s}
+}
+
+// Environment holds a store of key value pairs
+type Environment struct {
+	store map[string]Object
+}
+
+// Get retrieves a key from an Environment's store by name
+func (e *Environment) Get(name string) (Object, bool) {
+	obj, ok := e.store[name]
+	return obj, ok
+}
+
+// Set sets a key to an Environment's store by name
+func (e *Environment) Set(name string, val Object) Object {
+	e.store[name] = val
+	return val
+}

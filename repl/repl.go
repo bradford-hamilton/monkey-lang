@@ -7,6 +7,7 @@ import (
 
 	"github.com/bradford-hamilton/monkey-lang/evaluator"
 	"github.com/bradford-hamilton/monkey-lang/lexer"
+	"github.com/bradford-hamilton/monkey-lang/object"
 	"github.com/bradford-hamilton/monkey-lang/parser"
 )
 
@@ -15,6 +16,7 @@ const prompt = ">> "
 // Start - starts REPL, passes stdin to lexer line by line
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	env := object.NewEnvironment()
 
 	for {
 		fmt.Printf(prompt)
@@ -34,7 +36,7 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		evaluated := evaluator.Eval(program)
+		evaluated := evaluator.Eval(program, env)
 		if evaluated != nil {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
