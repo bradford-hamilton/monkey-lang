@@ -168,10 +168,63 @@ func (sl *StringLiteral) TokenLiteral() string { return sl.Token.Literal }
 // String - returns a string representation of the StringLiteral and satisfies our Node interface
 func (sl *StringLiteral) String() string { return sl.Token.Literal }
 
+// ArrayLiteral - holds the token: '[' and an array of expressions (Elements)
+type ArrayLiteral struct {
+	Token    token.Token // the '[' token
+	Elements []Expression
+}
+
+func (al *ArrayLiteral) expressionNode() {}
+
+// TokenLiteral returns the ArrayLiteral's Literal (the string) and satisfies the Node interface.
+func (al *ArrayLiteral) TokenLiteral() string { return al.Token.Literal }
+
+// String - loops through the array literal's elements and prints them. Satisfies our Node interface
+func (al *ArrayLiteral) String() string {
+	var out bytes.Buffer
+
+	elements := []string{}
+	for _, el := range al.Elements {
+		elements = append(elements, el.String())
+	}
+
+	out.WriteString("[")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("]")
+
+	return out.String()
+}
+
+// IndexExpression - holds the token
+type IndexExpression struct {
+	Token token.Token // The '[' token
+	Left  Expression  // The object being accessed
+	Index Expression  // Can be any expression, but must produce an integer
+}
+
+func (ie *IndexExpression) expressionNode() {}
+
+// TokenLiteral returns the IndexExpression's Literal and satisfies the Node interface.
+func (ie *IndexExpression) TokenLiteral() string { return ie.Token.Literal }
+
+// String - returns string representation of the IndexExpression: (leftExpr[indexExpr]).
+// Satisfies our Node interface
+func (ie *IndexExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(ie.Left.String())
+	out.WriteString("[")
+	out.WriteString(ie.Index.String())
+	out.WriteString("])")
+
+	return out.String()
+}
+
 // PrefixExpression - holds the token, a string version of the operator, and the expression to the right of it
 type PrefixExpression struct {
 	Token    token.Token // The prefix token (! or -)
-	Operator string      // string (either "!" or "-")
+	Operator string      // String (either "!" or "-")
 	Right    Expression  // The expression to the right of the operator
 }
 

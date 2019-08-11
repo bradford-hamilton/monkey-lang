@@ -411,6 +411,24 @@ func TestNativeFunctions(t *testing.T) {
 	}
 }
 
+func TestArrayLiterals(t *testing.T) {
+	input := "[1, 2 * 2, 3 + 3]"
+	evaluated := testEval(input)
+
+	result, ok := evaluated.(*object.Array)
+	if !ok {
+		t.Fatalf("Object is not an Array. Got: %T (%+v)", evaluated, evaluated)
+	}
+
+	if len(result.Elements) != 3 {
+		t.Fatalf("Array has wrong num of elements. Got:%d", len(result.Elements))
+	}
+
+	testIntegerObject(t, result.Elements[0], 1)
+	testIntegerObject(t, result.Elements[1], 4)
+	testIntegerObject(t, result.Elements[2], 6)
+}
+
 func testEval(input string) object.Object {
 	l := lexer.New(input)
 	p := parser.New(l)
