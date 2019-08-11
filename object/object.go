@@ -8,6 +8,8 @@ import (
 	"github.com/bradford-hamilton/monkey-lang/ast"
 )
 
+// ObjectType is merely a string. We define different object types as strings
+// and can then reference them as such rather than "string"
 type ObjectType string
 
 // Define object types
@@ -19,6 +21,7 @@ const (
 	ErrorObj       = "ERROR"
 	FunctionObj    = "FUNCTION"
 	StringObj      = "STRING"
+	NativeObj      = "NATIVE"
 )
 
 // Object represents monkey's object system. Every value in monkey-lang
@@ -27,6 +30,21 @@ type Object interface {
 	Type() ObjectType
 	Inspect() string
 }
+
+// NativeFunction is a type representing functions we write in Go and
+// expose to our users inside monkey-lang
+type NativeFunction func(args ...Object) Object
+
+// Native is our object wrapper holding a native function
+type Native struct {
+	Fn NativeFunction
+}
+
+// Type returns our Native's ObjectType
+func (n *Native) Type() ObjectType { return NativeObj }
+
+// Inspect simply returns "native function"
+func (n *Native) Inspect() string { return "native function" }
 
 // Integer type holds the value of the integer as an int64
 type Integer struct {
