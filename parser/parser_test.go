@@ -626,6 +626,25 @@ func TestCallExpressionParameterParsing(t *testing.T) {
 	}
 }
 
+func TestStringLiteralExpression(t *testing.T) {
+	input := `"hello world";`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+	stmt := program.Statements[0].(*ast.ExpressionStatement)
+
+	literal, ok := stmt.Expression.(*ast.StringLiteral)
+	if !ok {
+		t.Fatalf("expr not an *ast.StringLiteral. Got: %T", stmt.Expression)
+	}
+
+	if literal.Value != "hello world" {
+		t.Errorf("literal.Value not %q. Got: %q", "hello world", literal.Value)
+	}
+}
+
 func testIdentifier(t *testing.T, expr ast.Expression, value string) bool {
 	ident, ok := expr.(*ast.Identifier)
 	if !ok {

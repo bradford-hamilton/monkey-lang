@@ -18,6 +18,7 @@ const (
 	ReturnValueObj = "RETURN_VALUE"
 	ErrorObj       = "ERROR"
 	FunctionObj    = "FUNCTION"
+	StringObj      = "STRING"
 )
 
 // Object represents monkey's object system. Every value in monkey-lang
@@ -37,6 +38,17 @@ func (i *Integer) Type() ObjectType { return IntegerObj }
 
 // Inspect returns a string representation of the Integer's Value
 func (i *Integer) Inspect() string { return fmt.Sprintf("%d", i.Value) }
+
+// String type holds the value of the string
+type String struct {
+	Value string
+}
+
+// Type returns our String's ObjectType
+func (s *String) Type() ObjectType { return StringObj }
+
+// Inspect returns a string representation of the String's Value
+func (s *String) Inspect() string { return s.Value }
 
 // Boolean type holds the value of the boolean as a bool
 type Boolean struct {
