@@ -91,6 +91,16 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return elements[0]
 		}
 		return &object.Array{Elements: elements}
+	case *ast.IndexExpression:
+		left := Eval(node.Left, env)
+		if isError(left) {
+			return left
+		}
+		index := Eval(node.Index, env)
+		if isError(index) {
+			return index
+		}
+		return evalIndexExpr(left, index)
 	}
 
 	return nil
@@ -260,11 +270,32 @@ func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object
 		return val
 	}
 
-	if nativeFn, ok := nativeFunctions[node.Value]; ok {
-		return nativeFn
+	if builtinFn, ok := builtinFunctions[node.Value]; ok {
+		return builtinFn
 	}
 
 	return newError("Identifier not found: " + node.Value)
+}
+
+func evalIndexExpr(left, index object.Object) object.Object {
+	switch {
+	case left.Type() == object.ArrayObj && index.Type() == object.IntegerObj:
+		return evalArrayIndexExpr(left, index)
+	default:
+		return newError("Index operator not supported: %s", left.Type())
+	}
+}
+
+func evalArrayIndexExpr(array, index object.Object) object.Object {
+	arrayObj := array.(*object.Array)
+	idx := index.(*object.Integer).Value
+	max := int64(len(arrayObj.Elements) - 1)
+
+	if idx < 0 || idx > max {
+		return Null
+	}
+
+	return arrayObj.Elements[idx]
 }
 
 func evalExprs(exprs []ast.Expression, env *object.Environment) []object.Object {
@@ -287,7 +318,7 @@ func applyFunction(function object.Object, args []object.Object) object.Object {
 		extendedEnv := extendFunctionEnv(fn, args)
 		evaluated := Eval(fn.Body, extendedEnv)
 		return unwrapReturnValue(evaluated)
-	case *object.Native:
+	case *object.Builtin:
 		return fn.Fn(args...)
 	default:
 		return newError("Not a function: %s", function.Type())

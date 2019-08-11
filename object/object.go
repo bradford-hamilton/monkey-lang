@@ -21,7 +21,7 @@ const (
 	ErrorObj       = "ERROR"
 	FunctionObj    = "FUNCTION"
 	StringObj      = "STRING"
-	NativeObj      = "NATIVE"
+	BuiltinObj     = "BUILTIN"
 	ArrayObj       = "ARRAY"
 )
 
@@ -32,20 +32,20 @@ type Object interface {
 	Inspect() string
 }
 
-// NativeFunction is a type representing functions we write in Go and
+// BuiltinFunction is a type representing functions we write in Go and
 // expose to our users inside monkey-lang
-type NativeFunction func(args ...Object) Object
+type BuiltinFunction func(args ...Object) Object
 
-// Native is our object wrapper holding a native function
-type Native struct {
-	Fn NativeFunction
+// Builtin is our object wrapper holding a builtin function
+type Builtin struct {
+	Fn BuiltinFunction
 }
 
-// Type returns our Native's ObjectType
-func (n *Native) Type() ObjectType { return NativeObj }
+// Type returns our Builtin's ObjectType
+func (n *Builtin) Type() ObjectType { return BuiltinObj }
 
-// Inspect simply returns "native function"
-func (n *Native) Inspect() string { return "native function" }
+// Inspect simply returns "builtin function"
+func (n *Builtin) Inspect() string { return "builtin function" }
 
 // Integer type holds the value of the integer as an int64
 type Integer struct {

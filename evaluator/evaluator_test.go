@@ -347,7 +347,7 @@ ourFunction(20) + first + second;`
 	testIntegerObject(t, testEval(input), 70)
 }
 
-func TestNativeFunctions(t *testing.T) {
+func TestBuiltinFunctions(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected interface{}
@@ -357,19 +357,20 @@ func TestNativeFunctions(t *testing.T) {
 		{`len("hello world")`, 11},
 		{`len(1)`, "Argument to `len` not supported. Got: INTEGER"},
 		{`len("one", "two")`, "Wrong number of arguments. Got: 2, Expected: 1"},
-		// {`len([1, 2, 3])`, 3},
-		// {`len([])`, 0},
+		{`len([1, 2, 3])`, 3},
+		{`len([])`, 0},
 		// {`puts("hello", "world!")`, nil},
-		// {`first([1, 2, 3])`, 1},
-		// {`first([])`, nil},
-		// {`first(1)`, "argument to `first` must be ARRAY, got INTEGER"},
-		// {`last([1, 2, 3])`, 3},
-		// {`last([])`, nil},
-		// {`last(1)`, "argument to `last` must be ARRAY, got INTEGER"},
-		// {`rest([1, 2, 3])`, []int{2, 3}},
-		// {`rest([])`, nil},
-		// {`push([], 1)`, []int{1}},
-		// {`push(1, 1)`, "argument to `push` must be ARRAY, got INTEGER"},
+		{`first([1, 2, 3])`, 1},
+		{`first([])`, nil},
+		{`first(1)`, "Argument to `first` must be an Array. Got: INTEGER"},
+		{`last([1, 2, 3])`, 3},
+		{`last([])`, nil},
+		{`last(1)`, "Argument to `last` must be an Array. Got: INTEGER"},
+		{`rest([1, 2, 3])`, []int{2, 3}},
+		{`rest([1])`, nil},
+		{`rest([])`, nil},
+		{`push([], 1)`, []int{1}},
+		{`push(1, 1)`, "Argument to `push` must be an Array. Got: INTEGER"},
 	}
 
 	for _, tt := range tests {
@@ -407,6 +408,64 @@ func TestNativeFunctions(t *testing.T) {
 			// 	for i, expectedElem := range expected {
 			// 		testIntegerObject(t, array.Elements[i], int64(expectedElem))
 			// 	}
+		}
+	}
+}
+
+func TestArrayIndexExpressions(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{
+			"[1, 2, 3][0]",
+			1,
+		},
+		{
+			"[1, 2, 3][1]",
+			2,
+		},
+		{
+			"[1, 2, 3][2]",
+			3,
+		},
+		{
+			"let i = 0; [1][i];",
+			1,
+		},
+		{
+			"[1, 2, 3][1 + 1];",
+			3,
+		},
+		{
+			"let myArray = [1, 2, 3]; myArray[2];",
+			3,
+		},
+		{
+			"let myArray = [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];",
+			6,
+		},
+		{
+			"let myArray = [1, 2, 3]; let i = myArray[0]; myArray[i]",
+			2,
+		},
+		{
+			"[1, 2, 3][3]",
+			nil,
+		},
+		{
+			"[1, 2, 3][-1]",
+			nil,
+		},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
 		}
 	}
 }
