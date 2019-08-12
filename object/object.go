@@ -24,13 +24,20 @@ const (
 	StringObj      = "STRING"
 	BuiltinObj     = "BUILTIN"
 	ArrayObj       = "ARRAY"
+	HashObj        = "HASH"
 )
 
 // Object represents monkey's object system. Every value in monkey-lang
-// will be wrapped inside this struct
+// must implement this interface
 type Object interface {
 	Type() ObjectType
 	Inspect() string
+}
+
+// Hashable is one method called HashKey. Any object that that can be used as a HashKey
+// must implement this interface (*object.String, *object.boolean, *object.integer)
+type Hashable interface {
+	HashKey() HashKey
 }
 
 // BuiltinFunction is a type representing functions we write in Go and
@@ -144,6 +151,40 @@ func (s *String) HashKey() HashKey {
 		Type:  s.Type(),
 		Value: h.Sum64(),
 	}
+}
+
+// HashPair holds key value pairs
+type HashPair struct {
+	Key   Object
+	Value Object
+}
+
+// Hash hold Pairs which are a map of HashKey -> HashPair. We map the keys to HashPairs instead
+// of Objects for a better ability to Inspect() and see the key and value
+type Hash struct {
+	Pairs map[HashKey]HashPair
+}
+
+// Type returns Hash's ObjectType (HashObj)
+func (h *Hash) Type() ObjectType { return HashObj }
+
+// Inspect returns a string representation of the Hash
+func (h *Hash) Inspect() string {
+	var out bytes.Buffer
+
+	pairs := []string{}
+	for _, pair := range h.Pairs {
+		pairs = append(
+			pairs,
+			fmt.Sprintf("%s: %s", pair.Key.Inspect(), pair.Value.Inspect()),
+		)
+	}
+
+	out.WriteString("{")
+	out.WriteString(strings.Join(pairs, ", "))
+	out.WriteString("}")
+
+	return out.String()
 }
 
 // Null type is an empty struct
