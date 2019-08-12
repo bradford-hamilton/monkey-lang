@@ -1,8 +1,20 @@
 package evaluator
 
-import "github.com/bradford-hamilton/monkey-lang/object"
+import (
+	"fmt"
+
+	"github.com/bradford-hamilton/monkey-lang/object"
+)
 
 var builtinFunctions = map[string]*object.Builtin{
+	"puts": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			for _, arg := range args {
+				fmt.Println(arg.Inspect())
+			}
+			return Null
+		},
+	},
 	"len": &object.Builtin{
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
