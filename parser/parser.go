@@ -75,6 +75,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
 	p.registerPrefix(token.STRING, p.parseStringLiteral)
 	p.registerPrefix(token.LEFT_BRACKET, p.parseArrayLiteral)
+	p.registerPrefix(token.LEFT_BRACE, p.parseHashLiteral)
 
 	p.infixParseFuncs = make(map[token.TokenType]infixParseFunc)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -401,6 +402,35 @@ func (p *Parser) parseArrayLiteral() ast.Expression {
 	array.Elements = p.parseExprList(token.RIGHT_BRACKET)
 
 	return array
+}
+
+func (p *Parser) parseHashLiteral() ast.Expression {
+	hash := &ast.HashLiteral{Token: p.currentToken}
+	hash.Pairs = make(map[ast.Expression]ast.Expression)
+
+	for !p.peekTokenTypeIs(token.RIGHT_BRACE) {
+		p.nextToken()
+		key := p.parseExpr(LOWEST)
+
+		if !p.expectPeekType(token.COLON) {
+			return nil
+		}
+
+		p.nextToken()
+
+		value := p.parseExpr(LOWEST)
+		hash.Pairs[key] = value
+
+		if !p.peekTokenTypeIs(token.RIGHT_BRACE) && !p.expectPeekType(token.COMMA) {
+			return nil
+		}
+	}
+
+	if !p.expectPeekType(token.RIGHT_BRACE) {
+		return nil
+	}
+
+	return hash
 }
 
 func (p *Parser) parseIndexExpr(left ast.Expression) ast.Expression {

@@ -3,6 +3,7 @@ package object
 import (
 	"bytes"
 	"fmt"
+	"hash/fnv"
 	"strings"
 
 	"github.com/bradford-hamilton/monkey-lang/ast"
@@ -102,6 +103,47 @@ func (a *Array) Inspect() string {
 	out.WriteString("]")
 
 	return out.String()
+}
+
+// HashKey type wraps the key's type and holds its value
+type HashKey struct {
+	Type  ObjectType
+	Value uint64
+}
+
+// HashKey returns a HashKey with a Value of 1 or 0 (true or false) and a Type of BooleanObj
+func (b *Boolean) HashKey() HashKey {
+	var value uint64
+
+	if b.Value {
+		value = 1
+	} else {
+		value = 0
+	}
+
+	return HashKey{
+		Type:  b.Type(),
+		Value: value,
+	}
+}
+
+// HashKey returns a HashKey with a Value of the Integer and a Type of IntegerObj
+func (i *Integer) HashKey() HashKey {
+	return HashKey{
+		Type:  i.Type(),
+		Value: uint64(i.Value),
+	}
+}
+
+// HashKey returns a HashKey with a Value of a 64-bit FNV-1a hash of the String and a Type of StringObj
+func (s *String) HashKey() HashKey {
+	h := fnv.New64a()
+	h.Write([]byte(s.Value))
+
+	return HashKey{
+		Type:  s.Type(),
+		Value: h.Sum64(),
+	}
 }
 
 // Null type is an empty struct
