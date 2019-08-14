@@ -39,6 +39,8 @@ func (ins Instructions) fmtInstruction(def *Definition, operands []int) string {
 	}
 
 	switch operandCount {
+	case 0:
+		return def.Name
 	case 1:
 		return fmt.Sprintf("%s %d", def.Name, operands[0])
 	}
@@ -52,6 +54,7 @@ type Opcode byte
 // Define our opcode types
 const (
 	OpConstant Opcode = iota
+	OpAdd
 )
 
 // Definition for an opcode. Name helps to make an Opcode readable and OperandWidths
@@ -63,6 +66,7 @@ type Definition struct {
 
 var definitions = map[Opcode]*Definition{
 	OpConstant: {"OpConstant", []int{2}}, // OpConstant is 2 bytes wide which makes it a uint16 (limits value to 65535)
+	OpAdd:      {"OpAdd", []int{}},
 }
 
 // Lookup finds a definition by opcode. It returns it if it is found otherwise returns an error
