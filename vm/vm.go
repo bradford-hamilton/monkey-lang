@@ -31,12 +31,10 @@ func New(bytecode *compiler.Bytecode) *VM {
 	}
 }
 
-// StackTop returns the element currently at the top of the stack
-func (vm *VM) StackTop() object.Object {
-	if vm.sp == 0 {
-		return nil
-	}
-	return vm.stack[vm.sp-1]
+// LastPoppedStackElement returns last popped element on the top of the stack. We do not explicitly
+// set them to nil or remove them when calling pop so it will point to last popped.
+func (vm *VM) LastPoppedStackElement() object.Object {
+	return vm.stack[vm.sp]
 }
 
 // Run runs our VM and starts the fetch-decode-execute cycle
@@ -59,6 +57,8 @@ func (vm *VM) Run() error {
 			rightValue := right.(*object.Integer).Value
 			result := leftValue + rightValue
 			vm.push(&object.Integer{Value: result})
+		case code.OpPop:
+			vm.pop()
 		}
 	}
 
