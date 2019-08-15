@@ -53,12 +53,28 @@ type Opcode byte
 
 // Define our opcode types
 const (
+	// Constants
 	OpConstant Opcode = iota
+
+	// Aritmatic & stack top pop
 	OpAdd
 	OpPop
 	OpSub
 	OpMul
 	OpDiv
+
+	// Boolean
+	OpTrue
+	OpFalse
+
+	// Comparison
+	OpEqualEqual
+	OpNotEqual
+	OpGreaterThan
+
+	// Prefix/unary
+	OpMinus
+	OpBang
 )
 
 // Definition for an opcode. Name helps to make an Opcode readable and OperandWidths
@@ -69,12 +85,19 @@ type Definition struct {
 }
 
 var definitions = map[Opcode]*Definition{
-	OpConstant: {"OpConstant", []int{2}}, // OpConstant is 2 bytes wide which makes it a uint16 (limits value to 65535)
-	OpAdd:      {"OpAdd", []int{}},
-	OpPop:      {"OpPop", []int{}},
-	OpSub:      {"OpSub", []int{}},
-	OpMul:      {"OpMul", []int{}},
-	OpDiv:      {"OpDiv", []int{}},
+	OpConstant:    {"OpConstant", []int{2}}, // OpConstant is 2 bytes wide which makes it a uint16 (limits value to 65535)
+	OpAdd:         {"OpAdd", []int{}},
+	OpPop:         {"OpPop", []int{}},
+	OpSub:         {"OpSub", []int{}},
+	OpMul:         {"OpMul", []int{}},
+	OpDiv:         {"OpDiv", []int{}},
+	OpTrue:        {"OpTrue", []int{}},
+	OpFalse:       {"OpFalse", []int{}},
+	OpEqualEqual:  {"OpEqualEqual", []int{}},
+	OpNotEqual:    {"OpNotEqual", []int{}},
+	OpGreaterThan: {"OpGreaterThan", []int{}},
+	OpMinus:       {"OpMinus", []int{}},
+	OpBang:        {"OpBang", []int{}},
 }
 
 // Lookup finds a definition by opcode. It returns it if it is found otherwise returns an error

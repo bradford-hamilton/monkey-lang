@@ -11,6 +11,14 @@ import (
 // StackSize is an integer defining the size of our stack
 const StackSize = 2048
 
+// True - Immutable & unique. Will always be true, no need to create new objects in memory each time we
+// true boolean. Makes comparison easier because true always points to same place in memory
+var True = &object.Boolean{Value: true}
+
+// False - Immutable & unique. Will always be false, no need to create new objects in memory each time we
+// false boolean. Makes comparison easier because false always points to same place in memory
+var False = &object.Boolean{Value: false}
+
 // VM defines our Virtual Machine. It holds our constant pool, instructions, a stack, and an integer (index)
 // that points to the next free slot in the stack
 type VM struct {
@@ -50,13 +58,38 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+		case code.OpPop:
+			vm.pop()
 		case code.OpAdd, code.OpSub, code.OpMul, code.OpDiv:
 			err := vm.executeBinaryOperation(op)
 			if err != nil {
 				return err
 			}
-		case code.OpPop:
-			vm.pop()
+		case code.OpTrue:
+			err := vm.push(True)
+			if err != nil {
+				return err
+			}
+		case code.OpFalse:
+			err := vm.push(False)
+			if err != nil {
+				return err
+			}
+		case code.OpEqualEqual, code.OpNotEqual, code.OpGreaterThan:
+			err := vm.executeComparison(op)
+			if err != nil {
+				return err
+			}
+		case code.OpBang:
+			err := vm.executeBangOperator()
+			if err != nil {
+				return err
+			}
+		case code.OpMinus:
+			err := vm.executeMinusOperator()
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -114,4 +147,70 @@ func (vm *VM) executeBinaryIntegerOperation(op code.Opcode, left, right object.O
 	}
 
 	return vm.push(&object.Integer{Value: result})
+}
+
+func (vm *VM) executeComparison(op code.Opcode) error {
+	right := vm.pop()
+	left := vm.pop()
+
+	if left.Type() == object.IntegerObj || right.Type() == object.IntegerObj {
+		return vm.executeIntegerComparison(op, left, right)
+	}
+
+	switch op {
+	case code.OpEqualEqual:
+		return vm.push(nativeBoolToBooleanObj(right == left))
+	case code.OpNotEqual:
+		return vm.push(nativeBoolToBooleanObj(right != left))
+	default:
+		return fmt.Errorf("Unknown operator: %d (%s %s)", op, left.Type(), right.Type())
+	}
+}
+
+func (vm *VM) executeIntegerComparison(op code.Opcode, left, right object.Object) error {
+	leftValue := left.(*object.Integer).Value
+	rightValue := right.(*object.Integer).Value
+
+	switch op {
+	case code.OpEqualEqual:
+		return vm.push(nativeBoolToBooleanObj(rightValue == leftValue))
+	case code.OpNotEqual:
+		return vm.push(nativeBoolToBooleanObj(rightValue != leftValue))
+	case code.OpGreaterThan:
+		return vm.push(nativeBoolToBooleanObj(leftValue > rightValue))
+	default:
+		return fmt.Errorf("Unknown operator: %d", op)
+	}
+}
+
+func nativeBoolToBooleanObj(input bool) *object.Boolean {
+	if input {
+		return True
+	}
+	return False
+}
+
+func (vm *VM) executeBangOperator() error {
+	operand := vm.pop()
+
+	switch operand {
+	case True:
+		return vm.push(False)
+	case False:
+		return vm.push(True)
+	default:
+		return vm.push(False)
+	}
+}
+
+func (vm *VM) executeMinusOperator() error {
+	operand := vm.pop()
+
+	if operand.Type() != object.IntegerObj {
+		return fmt.Errorf("Unsupported type for negation: %s", operand.Type())
+	}
+
+	value := operand.(*object.Integer).Value
+
+	return vm.push(&object.Integer{Value: -value})
 }
