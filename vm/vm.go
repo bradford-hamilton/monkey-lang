@@ -11,13 +11,17 @@ import (
 // StackSize is an integer defining the size of our stack
 const StackSize = 2048
 
-// True - Immutable & unique. Will always be true, no need to create new objects in memory each time we
-// true boolean. Makes comparison easier because true always points to same place in memory
+// True, False, and Null - immutable & unique. No need to create new objects in memory each time we
+// need one. Makes comparison easier as well because they always point to same place in memory
+
+// True - Pointer to a Monkey object.Boolean with value true
 var True = &object.Boolean{Value: true}
 
-// False - Immutable & unique. Will always be false, no need to create new objects in memory each time we
-// false boolean. Makes comparison easier because false always points to same place in memory
+// False - Pointer to a Monkey object.Boolean of value false
 var False = &object.Boolean{Value: false}
+
+// Null - Pointer to a Monkey object.Null
+var Null = &object.Null{}
 
 // VM defines our Virtual Machine. It holds our constant pool, instructions, a stack, and an integer (index)
 // that points to the next free slot in the stack

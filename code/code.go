@@ -79,6 +79,9 @@ const (
 	// Jump for conditionals
 	OpJumpNotTruthy // Jump to alternative if consequence is not truthy
 	OpJump          // Jump no matter what (if we evaluate consequence and dont want the alternative)
+
+	// Null
+	OpNull
 )
 
 // Definition for an opcode. Name helps to make an Opcode readable and OperandWidths
@@ -104,6 +107,7 @@ var definitions = map[Opcode]*Definition{
 	OpBang:          {"OpBang", []int{}},
 	OpJumpNotTruthy: {"OpJumpNotTruthy", []int{2}},
 	OpJump:          {"OpJump", []int{2}},
+	OpNull:          {"OpNull", []int{}},
 }
 
 // Lookup finds a definition by opcode. It returns it if it is found otherwise returns an error
