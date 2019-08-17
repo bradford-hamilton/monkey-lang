@@ -56,7 +56,7 @@ const (
 	// Constants
 	OpConstant Opcode = iota
 
-	// Aritmatic & stack top pop
+	// Aritmatic & stack pop
 	OpAdd
 	OpPop
 	OpSub
@@ -86,6 +86,8 @@ const (
 	// Get and Set global variables
 	OpGetGlobal
 	OpSetGlobal
+
+	OpArray
 )
 
 // Definition for an opcode. Name helps to make an Opcode readable and OperandWidths
@@ -114,6 +116,7 @@ var definitions = map[Opcode]*Definition{
 	OpNull:          {"OpNull", []int{}},
 	OpGetGlobal:     {"OpGetGlobal", []int{2}},
 	OpSetGlobal:     {"OpSetGlobal", []int{2}},
+	OpArray:         {"OpArray", []int{2}},
 }
 
 // Lookup finds a definition by opcode. It returns it if it is found otherwise returns an error
