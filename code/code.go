@@ -82,6 +82,10 @@ const (
 
 	// Null
 	OpNull
+
+	// Get and Set global variables
+	OpGetGlobal
+	OpSetGlobal
 )
 
 // Definition for an opcode. Name helps to make an Opcode readable and OperandWidths
@@ -108,6 +112,8 @@ var definitions = map[Opcode]*Definition{
 	OpJumpNotTruthy: {"OpJumpNotTruthy", []int{2}},
 	OpJump:          {"OpJump", []int{2}},
 	OpNull:          {"OpNull", []int{}},
+	OpGetGlobal:     {"OpGetGlobal", []int{2}},
+	OpSetGlobal:     {"OpSetGlobal", []int{2}},
 }
 
 // Lookup finds a definition by opcode. It returns it if it is found otherwise returns an error

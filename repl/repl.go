@@ -7,6 +7,7 @@ import (
 
 	"github.com/bradford-hamilton/monkey-lang/compiler"
 	"github.com/bradford-hamilton/monkey-lang/lexer"
+	"github.com/bradford-hamilton/monkey-lang/object"
 	"github.com/bradford-hamilton/monkey-lang/parser"
 	"github.com/bradford-hamilton/monkey-lang/vm"
 )
@@ -16,7 +17,9 @@ const prompt = ">> "
 // Start - starts REPL, passes stdin to lexer line by line
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
-	// env := object.NewEnvironment()
+	constants := []object.Object{}
+	globals := make([]object.Object, vm.GlobalsSize)
+	symbolTable := compiler.NewSymbolTable()
 
 	for {
 		fmt.Printf(prompt)
@@ -36,20 +39,17 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		// evaluated := evaluator.Eval(program, env)
-		// if evaluated != nil {
-		// 	io.WriteString(out, evaluated.Inspect())
-		// 	io.WriteString(out, "\n")
-		// }
-
-		comp := compiler.New()
+		comp := compiler.NewWithState(symbolTable, constants)
 		err := comp.Compile(program)
 		if err != nil {
 			fmt.Fprintf(out, "Woops! Compilation failed:\n %s\n", err)
 			continue
 		}
 
-		machine := vm.New(comp.Bytecode())
+		code := comp.Bytecode()
+		constants = code.Constants
+
+		machine := vm.NewWithGlobalsState(code, globals)
 		err = machine.Run()
 		if err != nil {
 			fmt.Fprintf(out, "Woops! Executing bytecode failed:\n %s\n", err)

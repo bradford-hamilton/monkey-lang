@@ -28,6 +28,7 @@ type Compiler struct {
 	constants           []object.Object
 	lastInstruction     EmittedInstruction // Very last instruction emitted
 	previousInstruction EmittedInstruction // Instruction before the last emitted one
+	symbolTable         *SymbolTable
 }
 
 // New creates and returns a pointer to a Compiler with initialized instructions & constants
@@ -37,6 +38,7 @@ func New() *Compiler {
 		constants:           []object.Object{},
 		lastInstruction:     EmittedInstruction{},
 		previousInstruction: EmittedInstruction{},
+		symbolTable:         NewSymbolTable(),
 	}
 }
 
@@ -189,6 +191,22 @@ func (c *Compiler) Compile(node ast.Node) error {
 				return err
 			}
 		}
+
+	case *ast.LetStatement:
+		err := c.Compile(node.Value)
+		if err != nil {
+			return err
+		}
+		symbol := c.symbolTable.Define(node.Name.Value)
+		c.emit(code.OpSetGlobal, symbol.Index)
+
+	case *ast.Identifier:
+		symbol, ok := c.symbolTable.Resolve(node.Value)
+		if !ok {
+			return fmt.Errorf("Undefined variable %s", node.Value)
+		}
+
+		c.emit(code.OpGetGlobal, symbol.Index)
 	}
 
 	return nil
@@ -241,4 +259,13 @@ func (c *Compiler) changeOperand(opPos int, operand int) {
 	op := code.Opcode(c.instructions[opPos])
 	newInstruction := code.Make(op, operand)
 	c.replaceInstruction(opPos, newInstruction)
+}
+
+// NewWithState creates a new compiler with the passed in symbol table and constants (needed in REPL)
+func NewWithState(s *SymbolTable, constants []object.Object) *Compiler {
+	compiler := New()
+	compiler.symbolTable = s
+	compiler.constants = constants
+
+	return compiler
 }

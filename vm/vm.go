@@ -11,6 +11,9 @@ import (
 // StackSize is an integer defining the size of our stack
 const StackSize = 2048
 
+// GlobalsSize - The upper limit on the number of global bindings our VM supports
+const GlobalsSize = 65536
+
 // True, False, and Null - immutable & unique. No need to create new objects in memory each time we
 // need one. Makes comparison easier as well because they always point to same place in memory
 
@@ -30,6 +33,7 @@ type VM struct {
 	instructions code.Instructions
 	stack        []object.Object
 	sp           int // Stack pointer: always points to the next free slot in the stack. Top of stack is stack[ip-1]
+	globals      []object.Object
 }
 
 // New initializers and returns a pointer to a VM. It takes bytecode and sets the bytecode's instructions
@@ -40,6 +44,7 @@ func New(bytecode *compiler.Bytecode) *VM {
 		constants:    bytecode.Constants,
 		stack:        make([]object.Object, StackSize),
 		sp:           0,
+		globals:      make([]object.Object, GlobalsSize),
 	}
 }
 
@@ -107,6 +112,18 @@ func (vm *VM) Run() error {
 			}
 		case code.OpNull:
 			err := vm.push(Null)
+			if err != nil {
+				return err
+			}
+		case code.OpSetGlobal:
+			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+			vm.globals[globalIndex] = vm.pop()
+		case code.OpGetGlobal:
+			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+
+			err := vm.push(vm.globals[globalIndex])
 			if err != nil {
 				return err
 			}
@@ -246,4 +263,12 @@ func isTruthy(obj object.Object) bool {
 	default:
 		return true
 	}
+}
+
+// NewWithGlobalsState creates a new VM with a compiler's bytecode, sets the VMs globals
+// and returns a pointer to the VM (used in REPL)
+func NewWithGlobalsState(bytecode *compiler.Bytecode, s []object.Object) *VM {
+	vm := New(bytecode)
+	vm.globals = s
+	return vm
 }
