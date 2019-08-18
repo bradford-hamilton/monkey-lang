@@ -87,7 +87,10 @@ const (
 	OpGetGlobal
 	OpSetGlobal
 
+	// Data structures and index access
 	OpArray
+	OpHash
+	OpIndex
 )
 
 // Definition for an opcode. Name helps to make an Opcode readable and OperandWidths
@@ -117,6 +120,8 @@ var definitions = map[Opcode]*Definition{
 	OpGetGlobal:     {"OpGetGlobal", []int{2}},
 	OpSetGlobal:     {"OpSetGlobal", []int{2}},
 	OpArray:         {"OpArray", []int{2}},
+	OpHash:          {"OpHash", []int{2}},
+	OpIndex:         {"OpIndex", []int{}},
 }
 
 // Lookup finds a definition by opcode. It returns it if it is found otherwise returns an error
