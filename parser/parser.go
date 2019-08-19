@@ -200,7 +200,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 
 	stmt.Value = p.parseExpr(LOWEST)
 
-	for !p.currentTokenTypeIs(token.SEMICOLON) {
+	if p.peekTokenTypeIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
@@ -214,7 +214,7 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 
 	stmt.ReturnValue = p.parseExpr(LOWEST)
 
-	for !p.currentTokenTypeIs(token.SEMICOLON) {
+	if p.peekTokenTypeIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
