@@ -428,6 +428,123 @@ func TestIndexExpressions(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
+func TestFunctions(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `fn() { return 5 + 10 }`,
+			expectedConstants: []interface{}{
+				5,
+				10,
+				[]code.Instructions{
+					code.Make(code.OpConstant, 0),
+					code.Make(code.OpConstant, 1),
+					code.Make(code.OpAdd),
+					code.Make(code.OpReturnValue),
+				},
+			},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 2),
+				code.Make(code.OpPop),
+			},
+		},
+		// {
+		// 	input: `fn() { 5 + 10 }`,
+		// 	expectedConstants: []interface{}{
+		// 		5,
+		// 		10,
+		// 		[]code.Instructions{
+		// 			code.Make(code.OpConstant, 0),
+		// 			code.Make(code.OpConstant, 1),
+		// 			code.Make(code.OpAdd),
+		// 			code.Make(code.OpReturnValue),
+		// 		},
+		// 	},
+		// 	expectedInstructions: []code.Instructions{
+		// 		code.Make(code.OpConstant, 2),
+		// 		code.Make(code.OpPop),
+		// 	},
+		// },
+		// {
+		// 	input: `fn() { 1; 2 }`,
+		// 	expectedConstants: []interface{}{
+		// 		1,
+		// 		2,
+		// 		[]code.Instructions{
+		// 			code.Make(code.OpConstant, 0),
+		// 			code.Make(code.OpPop),
+		// 			code.Make(code.OpConstant, 1),
+		// 			code.Make(code.OpReturnValue),
+		// 		},
+		// 	},
+		// 	expectedInstructions: []code.Instructions{
+		// 		code.Make(code.OpConstant, 2),
+		// 		code.Make(code.OpPop),
+		// 	},
+		// },
+	}
+
+	runCompilerTests(t, tests)
+}
+
+func TestCompilerScopes(t *testing.T) {
+	compiler := New()
+	if compiler.scopeIndex != 0 {
+		t.Errorf("scopeIndex wrong. Got: %d. Expected: %d", compiler.scopeIndex, 0)
+	}
+	// globalSymbolTable := compiler.symbolTable
+
+	compiler.emit(code.OpMul)
+
+	compiler.enterScope()
+	if compiler.scopeIndex != 1 {
+		t.Errorf("scopeIndex wrong. Got: %d. Expected: %d", compiler.scopeIndex, 1)
+	}
+
+	compiler.emit(code.OpSub)
+
+	if len(compiler.scopes[compiler.scopeIndex].instructions) != 1 {
+		t.Errorf("instructions length wrong. Got: %d", len(compiler.scopes[compiler.scopeIndex].instructions))
+	}
+
+	last := compiler.scopes[compiler.scopeIndex].lastInstruction
+	if last.Opcode != code.OpSub {
+		t.Errorf("lastInstruction.Opcode wrong. Got: %d. Expected: %d", last.Opcode, code.OpSub)
+	}
+
+	// if compiler.symbolTable.Outer != globalSymbolTable {
+	// 	t.Errorf("Compiler did not enclose symbolTable")
+	// }
+
+	compiler.leaveScope()
+	if compiler.scopeIndex != 0 {
+		t.Errorf("scopeIndex wrong. Got: %d. Expected: %d", compiler.scopeIndex, 0)
+	}
+
+	// if compiler.symbolTable != globalSymbolTable {
+	// 	t.Errorf("Compiler did not restore global symbol table")
+	// }
+
+	// if compiler.symbolTable.Outer != nil {
+	// 	t.Errorf("Compiler modified global symbol table incorrectly")
+	// }
+
+	compiler.emit(code.OpAdd)
+
+	if len(compiler.scopes[compiler.scopeIndex].instructions) != 2 {
+		t.Errorf("Instructions length wrong. Got: %d", len(compiler.scopes[compiler.scopeIndex].instructions))
+	}
+
+	last = compiler.scopes[compiler.scopeIndex].lastInstruction
+	if last.Opcode != code.OpAdd {
+		t.Errorf("lastInstruction.Opcode wrong. Got: %d. Expected: %d", last.Opcode, code.OpAdd)
+	}
+
+	previous := compiler.scopes[compiler.scopeIndex].previousInstruction
+	if previous.Opcode != code.OpMul {
+		t.Errorf("previousInstruction.Opcode wrong. Got: %d. Expected: %d", previous.Opcode, code.OpMul)
+	}
+}
+
 func parse(input string) *ast.RootNode {
 	l := lexer.New(input)
 	p := parser.New(l)
@@ -502,6 +619,17 @@ func testConstants(t *testing.T, expected []interface{}, actual []object.Object)
 			err := testStringObject(constant, actual[i])
 			if err != nil {
 				return fmt.Errorf("constant %d - testStringObject failed: %s", i, err)
+			}
+		case []code.Instructions:
+			fn, ok := actual[i].(*object.CompiledFunction)
+			if !ok {
+				return fmt.Errorf("constant %d - not a function: %T",
+					i, actual[i])
+			}
+
+			err := testInstructions(constant, fn.Instructions)
+			if err != nil {
+				return fmt.Errorf("constant %d - testInstructions failed: %s", i, err)
 			}
 		}
 	}

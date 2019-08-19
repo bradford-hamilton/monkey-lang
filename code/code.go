@@ -91,6 +91,11 @@ const (
 	OpArray
 	OpHash
 	OpIndex
+
+	// Call expression, return with value, return without value
+	OpCall
+	OpReturnValue // Tells VM to leave value on top of stack
+	OpReturn      // Tells VM implicit return of Null
 )
 
 // Definition for an opcode. Name helps to make an Opcode readable and OperandWidths
@@ -122,6 +127,9 @@ var definitions = map[Opcode]*Definition{
 	OpArray:         {"OpArray", []int{2}},
 	OpHash:          {"OpHash", []int{2}},
 	OpIndex:         {"OpIndex", []int{}},
+	OpCall:          {"OpCall", []int{}},
+	OpReturnValue:   {"OpReturnValue", []int{}},
+	OpReturn:        {"OpReturn", []int{}},
 }
 
 // Lookup finds a definition by opcode. It returns it if it is found otherwise returns an error
