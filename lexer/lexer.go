@@ -1,6 +1,8 @@
 package lexer
 
-import "github.com/bradford-hamilton/monkey-lang/token"
+import (
+	"github.com/bradford-hamilton/monkey-lang/token"
+)
 
 // Lexer performs our lexical analysis/scanning
 type Lexer struct {

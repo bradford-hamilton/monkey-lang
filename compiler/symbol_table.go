@@ -12,6 +12,7 @@ type SymbolScope string
 // Define all our scopes
 const (
 	GlobalScope SymbolScope = "GLOBAL"
+	LocalScope  SymbolScope = "LOCAL"
 )
 
 // Symbol - Holds all the necessary info about a symbol - Name, Scope, and Index
@@ -21,10 +22,12 @@ type Symbol struct {
 	Index int
 }
 
-// SymbolTable holds a "store" which is a map of strings to Symbols and an int of number of definitions
+// SymbolTable holds a "store" which is a map of strings to Symbols, an int of number of definitions,
+// and "Outer" which defines it's parent scope
 type SymbolTable struct {
 	store          map[string]Symbol
 	numDefinitions int
+	Outer          *SymbolTable
 }
 
 // NewSymbolTable creates and returns a pointer to a symbol table initialized with a "store"
@@ -33,14 +36,28 @@ func NewSymbolTable() *SymbolTable {
 	return &SymbolTable{store: s}
 }
 
+// NewEnclosedSymbolTable takes an outer parent symbol table and returns a pointer to the new
+// enclosed SymbolTable after attaching the outer parent to the new one
+func NewEnclosedSymbolTable(outer *SymbolTable) *SymbolTable {
+	s := NewSymbolTable()
+	s.Outer = outer
+	return s
+}
+
 // Define takes a name and creates a symbol with the name, an index, and assigns scope. It then assigns
 // the symbol to the SymbolTable's store, increases numDefinitions and returns the symbol.
 func (s *SymbolTable) Define(name string) Symbol {
 	symbol := Symbol{
 		Name:  name,
 		Index: s.numDefinitions,
-		Scope: GlobalScope,
 	}
+
+	if s.Outer == nil {
+		symbol.Scope = GlobalScope
+	} else {
+		symbol.Scope = LocalScope
+	}
+
 	s.store[name] = symbol
 	s.numDefinitions++
 
@@ -51,5 +68,11 @@ func (s *SymbolTable) Define(name string) Symbol {
 // with a boolean representing whether it was found
 func (s *SymbolTable) Resolve(name string) (Symbol, bool) {
 	obj, ok := s.store[name]
+
+	if !ok && s.Outer != nil {
+		obj, ok = s.Outer.Resolve(name)
+		return obj, ok
+	}
+
 	return obj, ok
 }

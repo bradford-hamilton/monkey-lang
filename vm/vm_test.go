@@ -155,6 +155,265 @@ func TestIndexExpressions(t *testing.T) {
 	runVMTests(t, tests)
 }
 
+func TestCallingFunctionsWithoutArguments(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `
+				let fivePlusTen = func() { 5 + 10; };
+				fivePlusTen();
+		`,
+			expected: 15,
+		},
+		{
+			input: `
+				let one = func() { 1; };
+				let two = func() { 2; };
+				one() + two()
+		`,
+			expected: 3,
+		},
+		{
+			input: `
+				let a = func() { 1 };
+				let b = func() { a() + 1 };
+				let c = func() { b() + 1 };
+				c();
+		`,
+			expected: 3,
+		},
+	}
+
+	runVMTests(t, tests)
+}
+
+func TestFunctionsWithReturnStatement(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `
+				let earlyExit = func() { return 99; 100; };
+				earlyExit();
+		`,
+			expected: 99,
+		},
+		{
+			input: `
+				let earlyExit = func() { return 99; return 100; };
+				earlyExit();
+		`,
+			expected: 99,
+		},
+	}
+
+	runVMTests(t, tests)
+}
+
+func TestFunctionsWithoutReturnValue(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `
+				let noReturn = func() { };
+				noReturn();
+		`,
+			expected: Null,
+		},
+		{
+			input: `
+				let noReturn = func() { };
+				let noReturnTwo = func() { noReturn(); };
+				noReturn();
+				noReturnTwo();
+		`,
+			expected: Null,
+		},
+	}
+
+	runVMTests(t, tests)
+}
+
+func TestFirstClassFunctions(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `
+				let returnsOne = func() { 1; };
+				let returnsOneReturner = func() { returnsOne; };
+				returnsOneReturner()();
+		`,
+			expected: 1,
+		},
+		{
+			input: `
+				let returnsOneReturner = func() {
+					let returnsOne = func() { 1; };
+					returnsOne;
+				};
+				returnsOneReturner()();
+		`,
+			expected: 1,
+		},
+	}
+
+	runVMTests(t, tests)
+}
+
+func TestCallingFunctionsWithBindings(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `
+				let one = func() { let one = 1; one };
+				one();
+		`,
+			expected: 1,
+		},
+		{
+			input: `
+				let oneAndTwo = func() { let one = 1; let two = 2; one + two; };
+				oneAndTwo();
+		`,
+			expected: 3,
+		},
+		{
+			input: `
+				let oneAndTwo = func() { let one = 1; let two = 2; one + two; };
+				let threeAndFour = func() { let three = 3; let four = 4; three + four; };
+				oneAndTwo() + threeAndFour();
+		`,
+			expected: 10,
+		},
+		{
+			input: `
+				let firstFoobar = func() { let foobar = 50; foobar; };
+				let secondFoobar = func() { let foobar = 100; foobar; };
+				firstFoobar() + secondFoobar();
+		`,
+			expected: 150,
+		},
+		{
+			input: `
+				let globalSeed = 50;
+				let minusOne = func() {
+					let num = 1;
+					globalSeed - num;
+				}
+				let minusTwo = func() {
+					let num = 2;
+					globalSeed - num;
+				}
+				minusOne() + minusTwo();
+		`,
+			expected: 97,
+		},
+	}
+
+	runVMTests(t, tests)
+}
+
+func TestCallingFunctionsWithArgumentsAndBindings(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `
+				let identity = func(a) { a; };
+				identity(4);
+		`,
+			expected: 4,
+		},
+		{
+			input: `
+				let sum = func(a, b) { a + b; };
+				sum(1, 2);
+		`,
+			expected: 3,
+		},
+		{
+			input: `
+				let sum = func(a, b) {
+					let c = a + b;
+					c;
+				};
+				sum(1, 2);
+		`,
+			expected: 3,
+		},
+		{
+			input: `
+				let sum = func(a, b) {
+					let c = a + b;
+					c;
+				};
+				sum(1, 2) + sum(3, 4);`,
+			expected: 10,
+		},
+		{
+			input: `
+				let sum = func(a, b) {
+					let c = a + b;
+					c;
+				};
+				let outer = func() {
+					sum(1, 2) + sum(3, 4);
+				};
+				outer();
+		`,
+			expected: 10,
+		},
+		{
+			input: `
+				let globalNum = 10;
+
+				let sum = func(a, b) {
+					let c = a + b;
+					c + globalNum;
+				};
+
+				let outer = func() {
+					sum(1, 2) + sum(3, 4) + globalNum;
+				};
+
+				outer() + globalNum;
+		`,
+			expected: 50,
+		},
+	}
+
+	runVMTests(t, tests)
+}
+
+func TestCallingFunctionsWithWrongArguments(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input:    `func() { 1; }(1);`,
+			expected: `Wrong number of arguments. Expected: 0. Got: 1`,
+		},
+		{
+			input:    `func(a) { a; }();`,
+			expected: `Wrong number of arguments. Expected: 1. Got: 0`,
+		},
+		{
+			input:    `func(a, b) { a + b; }(1);`,
+			expected: `Wrong number of arguments. Expected: 2. Got: 1`,
+		},
+	}
+
+	for _, tt := range tests {
+		program := parse(tt.input)
+
+		comp := compiler.New()
+		err := comp.Compile(program)
+		if err != nil {
+			t.Fatalf("compiler error: %s", err)
+		}
+
+		vm := New(comp.Bytecode())
+		err = vm.Run()
+		if err == nil {
+			t.Fatalf("expected VM error but resulted in none.")
+		}
+
+		if err.Error() != tt.expected {
+			t.Fatalf("wrong VM error. Want: %q. Got: %q", tt.expected, err)
+		}
+	}
+}
+
 type vmTestCase struct {
 	input    string
 	expected interface{}
