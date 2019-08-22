@@ -1,7 +1,6 @@
 package object
 
-// ObjectType is merely a string. We define different object types as strings
-// and can then reference them as such rather than "string"
+// ObjectType - Type alias for a string.
 type ObjectType string
 
 // Define object types
@@ -17,6 +16,7 @@ const (
 	ArrayObj            = "ARRAY"
 	HashObj             = "HASH"
 	CompiledFunctionObj = "COMPILED_FUNCTION_OBJ"
+	ClosureObj          = "CLOSURE"
 )
 
 // Object represents monkey's object system. Every value in monkey-lang

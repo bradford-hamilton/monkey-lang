@@ -16,21 +16,21 @@ import (
 // implemented, the requirements in regards to concurrency and performance, the host language, and more.
 // We are choosing the way that is easiest to build, understand, extend, etc.
 type Frame struct {
-	fn          *object.CompiledFunction
+	closure     *object.Closure
 	ip          int
 	basePointer int // Keeps track of the stacks pointer's value before we execute a function so we can restore stack to this value after executing
 }
 
 // Instructions returns the frame's function's instructions
 func (f *Frame) Instructions() code.Instructions {
-	return f.fn.Instructions
+	return f.closure.Fn.Instructions
 }
 
 // NewFrame takes a pointer to a compiled function, creates a frame with it, sets the instruction
 // pointer to -1, and returns a pointer to the frame.
-func NewFrame(fn *object.CompiledFunction, basePointer int) *Frame {
+func NewFrame(cl *object.Closure, basePointer int) *Frame {
 	return &Frame{
-		fn:          fn,
+		closure:     cl,
 		ip:          -1,
 		basePointer: basePointer, // The pointer that points to the bottom of the stack of the current call frame. (Sometimes called "FramePointer")
 	}

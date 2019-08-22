@@ -348,7 +348,8 @@ func (c *Compiler) Compile(node ast.Node) error {
 			NumParameters: len(node.Parameters),
 		}
 
-		c.emit(code.OpConstant, c.addConstant(compiledFunc))
+		fnIndex := c.addConstant(compiledFunc)
+		c.emit(code.OpClosure, fnIndex, 0)
 
 	case *ast.ReturnStatement:
 		err := c.Compile(node.ReturnValue)

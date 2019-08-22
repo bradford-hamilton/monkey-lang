@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-// Instructions are a slice of byte
+// Instructions - Type alias for a slice of byte.
 type Instructions []byte
 
 // String is a sort of mini dissassembler to print our bytecode in human readable format
@@ -43,6 +43,8 @@ func (ins Instructions) fmtInstruction(def *Definition, operands []int) string {
 		return def.Name
 	case 1:
 		return fmt.Sprintf("%s %d", def.Name, operands[0])
+	case 2:
+		return fmt.Sprintf("%s %d %d", def.Name, operands[0], operands[1])
 	}
 
 	return fmt.Sprintf("ERROR: unhandled operandCount for %s\n", def.Name)
@@ -103,6 +105,10 @@ const (
 
 	// Builtin functions
 	OpGetBuiltin
+
+	// Closures and it's variables
+	OpClosure
+	OpGetFree
 )
 
 // Definition for an opcode. Name helps to make an Opcode readable and OperandWidths
@@ -134,12 +140,19 @@ var definitions = map[Opcode]*Definition{
 	OpArray:         {"OpArray", []int{2}},
 	OpHash:          {"OpHash", []int{2}},
 	OpIndex:         {"OpIndex", []int{}},
-	OpCall:          {"OpCall", []int{1}},
+	OpCall:          {"OpCall", []int{1}}, // OpCall is 1 byte wide which makes it a uint8 (limits value to 255)
 	OpReturnValue:   {"OpReturnValue", []int{}},
 	OpReturn:        {"OpReturn", []int{}},
 	OpGetLocal:      {"OpGetLocal", []int{1}},
 	OpSetLocal:      {"OpSetLocal", []int{1}},
 	OpGetBuiltin:    {"OpGetBuiltin", []int{1}},
+
+	// Has two operands, first is two bytes wide - the constant index. Specifies where in the constant pool we
+	// can find the *object.CompiledFunction that's to be converted into a closure. It's two bytes wide because
+	// the operand of OpConstant is also two bytes wide. The second operand, one byte wide, specifies how many
+	// free variables sit on the stack and need to be transferred to the about-to-be-created closure.
+	OpClosure: {"OpClosure", []int{2, 1}},
+	OpGetFree: {"OpGetFree", []int{1}},
 }
 
 // Lookup finds a definition by opcode. It returns it if it is found otherwise returns an error
