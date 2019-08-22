@@ -100,6 +100,9 @@ const (
 	// Get and Set local bindings
 	OpGetLocal
 	OpSetLocal
+
+	// Builtin functions
+	OpGetBuiltin
 )
 
 // Definition for an opcode. Name helps to make an Opcode readable and OperandWidths
@@ -136,6 +139,7 @@ var definitions = map[Opcode]*Definition{
 	OpReturn:        {"OpReturn", []int{}},
 	OpGetLocal:      {"OpGetLocal", []int{1}},
 	OpSetLocal:      {"OpSetLocal", []int{1}},
+	OpGetBuiltin:    {"OpGetBuiltin", []int{1}},
 }
 
 // Lookup finds a definition by opcode. It returns it if it is found otherwise returns an error

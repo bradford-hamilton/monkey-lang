@@ -11,8 +11,9 @@ type SymbolScope string
 
 // Define all our scopes
 const (
-	GlobalScope SymbolScope = "GLOBAL"
-	LocalScope  SymbolScope = "LOCAL"
+	GlobalScope  SymbolScope = "GLOBAL"
+	LocalScope   SymbolScope = "LOCAL"
+	BuiltinScope SymbolScope = "BUILTIN"
 )
 
 // Symbol - Holds all the necessary info about a symbol - Name, Scope, and Index
@@ -75,4 +76,16 @@ func (s *SymbolTable) Resolve(name string) (Symbol, bool) {
 	}
 
 	return obj, ok
+}
+
+// DefineBuiltin creates and returns a symbol within builtin scope
+func (s *SymbolTable) DefineBuiltin(index int, name string) Symbol {
+	symbol := Symbol{
+		Name:  name,
+		Index: index,
+		Scope: BuiltinScope,
+	}
+	s.store[name] = symbol
+
+	return symbol
 }
