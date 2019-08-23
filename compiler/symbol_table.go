@@ -14,6 +14,7 @@ const (
 	GlobalScope  SymbolScope = "GLOBAL"
 	LocalScope   SymbolScope = "LOCAL"
 	BuiltinScope SymbolScope = "BUILTIN"
+	FreeScope    SymbolScope = "FREE"
 )
 
 // Symbol - Holds all the necessary info about a symbol - Name, Scope, and Index
@@ -29,12 +30,18 @@ type SymbolTable struct {
 	store          map[string]Symbol
 	numDefinitions int
 	Outer          *SymbolTable
+	FreeSymbols    []Symbol
 }
 
 // NewSymbolTable creates and returns a pointer to a symbol table initialized with a "store"
 func NewSymbolTable() *SymbolTable {
 	s := make(map[string]Symbol)
-	return &SymbolTable{store: s}
+	freeSymbols := []Symbol{}
+
+	return &SymbolTable{
+		store:       s,
+		FreeSymbols: freeSymbols,
+	}
 }
 
 // NewEnclosedSymbolTable takes an outer parent symbol table and returns a pointer to the new
@@ -65,19 +72,6 @@ func (s *SymbolTable) Define(name string) Symbol {
 	return symbol
 }
 
-// Resolve takes a name, looks for it in the SymbolTable's store, and returns it if found along
-// with a boolean representing whether it was found
-func (s *SymbolTable) Resolve(name string) (Symbol, bool) {
-	obj, ok := s.store[name]
-
-	if !ok && s.Outer != nil {
-		obj, ok = s.Outer.Resolve(name)
-		return obj, ok
-	}
-
-	return obj, ok
-}
-
 // DefineBuiltin creates and returns a symbol within builtin scope
 func (s *SymbolTable) DefineBuiltin(index int, name string) Symbol {
 	symbol := Symbol{
@@ -88,4 +82,40 @@ func (s *SymbolTable) DefineBuiltin(index int, name string) Symbol {
 	s.store[name] = symbol
 
 	return symbol
+}
+
+func (s *SymbolTable) defineFree(original Symbol) Symbol {
+	s.FreeSymbols = append(s.FreeSymbols, original)
+
+	symbol := Symbol{
+		Name:  original.Name,
+		Index: len(s.FreeSymbols) - 1,
+	}
+	symbol.Scope = FreeScope
+	s.store[original.Name] = symbol
+
+	return symbol
+}
+
+// Resolve takes a name, looks for it in the SymbolTable's store, and returns it if found along
+// with a boolean representing whether it was found
+func (s *SymbolTable) Resolve(name string) (Symbol, bool) {
+	obj, ok := s.store[name]
+
+	if !ok && s.Outer != nil {
+		obj, ok = s.Outer.Resolve(name)
+		if !ok {
+			return obj, ok
+		}
+
+		if obj.Scope == GlobalScope || obj.Scope == BuiltinScope {
+			return obj, ok
+		}
+
+		free := s.defineFree(obj)
+
+		return free, true
+	}
+
+	return obj, ok
 }

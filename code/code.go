@@ -109,6 +109,7 @@ const (
 	// Closures and it's variables
 	OpClosure
 	OpGetFree
+	OpCurrentClosure
 )
 
 // Definition for an opcode. Name helps to make an Opcode readable and OperandWidths
@@ -151,8 +152,9 @@ var definitions = map[Opcode]*Definition{
 	// can find the *object.CompiledFunction that's to be converted into a closure. It's two bytes wide because
 	// the operand of OpConstant is also two bytes wide. The second operand, one byte wide, specifies how many
 	// free variables sit on the stack and need to be transferred to the about-to-be-created closure.
-	OpClosure: {"OpClosure", []int{2, 1}},
-	OpGetFree: {"OpGetFree", []int{1}},
+	OpClosure:        {"OpClosure", []int{2, 1}},
+	OpGetFree:        {"OpGetFree", []int{1}},
+	OpCurrentClosure: {"OpCurrentClosure", []int{}},
 }
 
 // Lookup finds a definition by opcode. It returns it if it is found otherwise returns an error
