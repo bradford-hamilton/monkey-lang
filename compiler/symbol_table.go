@@ -11,10 +11,11 @@ type SymbolScope string
 
 // Define all our scopes
 const (
-	GlobalScope  SymbolScope = "GLOBAL"
-	LocalScope   SymbolScope = "LOCAL"
-	BuiltinScope SymbolScope = "BUILTIN"
-	FreeScope    SymbolScope = "FREE"
+	GlobalScope   SymbolScope = "GLOBAL"
+	LocalScope    SymbolScope = "LOCAL"
+	BuiltinScope  SymbolScope = "BUILTIN"
+	FreeScope     SymbolScope = "FREE"
+	FunctionScope SymbolScope = "FUNCTION"
 )
 
 // Symbol - Holds all the necessary info about a symbol - Name, Scope, and Index
@@ -93,6 +94,18 @@ func (s *SymbolTable) defineFree(original Symbol) Symbol {
 	}
 	symbol.Scope = FreeScope
 	s.store[original.Name] = symbol
+
+	return symbol
+}
+
+// DefineFunctionName creates a new Symbol with FunctionScope and adds it to the s.store
+func (s *SymbolTable) DefineFunctionName(name string) Symbol {
+	symbol := Symbol{
+		Name:  name,
+		Index: 0,
+		Scope: FunctionScope,
+	}
+	s.store[name] = symbol
 
 	return symbol
 }
