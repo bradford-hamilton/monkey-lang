@@ -41,7 +41,7 @@ func Start(in io.Reader, out io.Writer, engine *string) {
 	}
 
 	for {
-		fmt.Printf(">>")
+		fmt.Printf(">> ")
 
 		scanned := scanner.Scan()
 		if !scanned {

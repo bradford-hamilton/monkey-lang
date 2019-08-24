@@ -21,6 +21,6 @@ func main() {
 	if *console == true {
 		repl.Start(os.Stdin, os.Stdout, engine)
 	} else {
-		fmt.Print("Add ability to pass file path and execute...")
+		fmt.Print("Add ability to pass file path and execute...\n")
 	}
 }
