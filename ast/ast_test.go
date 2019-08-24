@@ -10,13 +10,13 @@ func TestString(t *testing.T) {
 	program := &RootNode{
 		Statements: []Statement{
 			&LetStatement{
-				Token: token.Token{Type: token.LET, Literal: "let"},
+				Token: token.Token{Type: token.Let, Literal: "let"},
 				Name: &Identifier{
-					Token: token.Token{Type: token.IDENTIFIER, Literal: "myVar"},
+					Token: token.Token{Type: token.Identifier, Literal: "myVar"},
 					Value: "myVar",
 				},
 				Value: &Identifier{
-					Token: token.Token{Type: token.IDENTIFIER, Literal: "anotherVar"},
+					Token: token.Token{Type: token.Identifier, Literal: "anotherVar"},
 					Value: "anotherVar",
 				},
 			},

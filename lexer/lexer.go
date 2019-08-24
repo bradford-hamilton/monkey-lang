@@ -104,51 +104,51 @@ func (l *Lexer) NextToken() token.Token {
 			ch := l.char
 			l.readChar()
 			literal := string(ch) + string(l.char)
-			t = token.Token{Type: token.EQUAL_EQUAL, Literal: literal}
+			t = token.Token{Type: token.EqualEqual, Literal: literal}
 		} else {
-			t = newToken(token.EQUAL, l.char)
+			t = newToken(token.Equal, l.char)
 		}
 	case '+':
-		t = newToken(token.PLUS, l.char)
+		t = newToken(token.Plus, l.char)
 	case '-':
-		t = newToken(token.MINUS, l.char)
+		t = newToken(token.Minus, l.char)
 	case '!':
 		if l.peek() == '=' {
 			ch := l.char
 			l.readChar()
 			literal := string(ch) + string(l.char)
-			t = token.Token{Type: token.BANG_EQUAL, Literal: literal}
+			t = token.Token{Type: token.BangEqual, Literal: literal}
 		} else {
-			t = newToken(token.BANG, l.char)
+			t = newToken(token.Bang, l.char)
 		}
 	case '*':
-		t = newToken(token.STAR, l.char)
+		t = newToken(token.Star, l.char)
 	case '/':
-		t = newToken(token.SLASH, l.char)
+		t = newToken(token.Slash, l.char)
 	case '<':
-		t = newToken(token.LESS_EQUAL, l.char)
+		t = newToken(token.LessEqual, l.char)
 	case '>':
-		t = newToken(token.GREATER_EQUAL, l.char)
+		t = newToken(token.GreaterEqual, l.char)
 	case ',':
-		t = newToken(token.COMMA, l.char)
+		t = newToken(token.Comma, l.char)
 	case ':':
-		t = newToken(token.COLON, l.char)
+		t = newToken(token.Colon, l.char)
 	case ';':
-		t = newToken(token.SEMICOLON, l.char)
+		t = newToken(token.Semicolon, l.char)
 	case '(':
-		t = newToken(token.LEFT_PAREN, l.char)
+		t = newToken(token.LeftParen, l.char)
 	case ')':
-		t = newToken(token.RIGHT_PAREN, l.char)
+		t = newToken(token.RightParen, l.char)
 	case '{':
-		t = newToken(token.LEFT_BRACE, l.char)
+		t = newToken(token.LeftBrace, l.char)
 	case '}':
-		t = newToken(token.RIGHT_BRACE, l.char)
+		t = newToken(token.RightBrace, l.char)
 	case '[':
-		t = newToken(token.LEFT_BRACKET, l.char)
+		t = newToken(token.LeftBracket, l.char)
 	case ']':
-		t = newToken(token.RIGHT_BRACKET, l.char)
+		t = newToken(token.RightBracket, l.char)
 	case '"':
-		t.Type = token.STRING
+		t.Type = token.String
 		t.Literal = l.readString()
 	case 0:
 		t.Literal = ""
@@ -160,10 +160,10 @@ func (l *Lexer) NextToken() token.Token {
 			return t
 		} else if isInteger(l.char) {
 			t.Literal = l.readInteger()
-			t.Type = token.INTEGER
+			t.Type = token.Integer
 			return t
 		} else {
-			t = newToken(token.ILLEGAL, l.char)
+			t = newToken(token.Illegal, l.char)
 		}
 	}
 

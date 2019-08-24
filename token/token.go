@@ -1,62 +1,65 @@
 package token
 
+// Define all of monkey's tokens
 const (
-	ILLEGAL = "ILLEGAL" // Token/character we don't know about
+	Illegal = "ILLEGAL" // Token/character we don't know about
 	EOF     = "EOF"     // End of file
 
 	// Identifiers & literals
-	IDENTIFIER = "IDENTIFIER" // add, foobar, x, y, ...
-	INTEGER    = "INTEGER"
-	STRING     = "STRING"
+	Identifier = "IDENTIFIER" // add, foobar, x, y, ...
+	Integer    = "INTEGER"
+	String     = "STRING"
 
 	// Operators
-	EQUAL         = "="
-	PLUS          = "+"
-	MINUS         = "-"
-	BANG          = "!"
-	STAR          = "*"
-	SLASH         = "/"
-	EQUAL_EQUAL   = "=="
-	LESS_EQUAL    = "<"
-	GREATER_EQUAL = ">"
-	BANG_EQUAL    = "!="
+	Equal        = "="
+	Plus         = "+"
+	Minus        = "-"
+	Bang         = "!"
+	Star         = "*"
+	Slash        = "/"
+	EqualEqual   = "=="
+	LessEqual    = "<"
+	GreaterEqual = ">"
+	BangEqual    = "!="
 
 	// Delimiters
-	COMMA         = ","
-	COLON         = ":"
-	SEMICOLON     = ";"
-	LEFT_PAREN    = "("
-	RIGHT_PAREN   = ")"
-	LEFT_BRACE    = "{"
-	RIGHT_BRACE   = "}"
-	LEFT_BRACKET  = "["
-	RIGHT_BRACKET = "]"
+	Comma        = ","
+	Colon        = ":"
+	Semicolon    = ";"
+	LeftParen    = "("
+	RightParen   = ")"
+	LeftBrace    = "{"
+	RightBrace   = "}"
+	LeftBracket  = "["
+	RightBracket = "]"
 
 	// Keywords
-	FUNCTION = "FUNCTION"
-	LET      = "LET"
-	TRUE     = "TRUE"
-	FALSE    = "FALSE"
-	IF       = "IF"
-	ELSE     = "ELSE"
-	RETURN   = "RETURN"
+	Function = "FUNCTION"
+	Let      = "LET"
+	True     = "TRUE"
+	False    = "FALSE"
+	If       = "IF"
+	Else     = "ELSE"
+	Return   = "RETURN"
 )
 
+// TokenType is a type alias for a string
 type TokenType string
 
+// Token is a struct representing a Monkey token - holds a Type and a Literal
 type Token struct {
 	Type    TokenType
 	Literal string
 }
 
 var keywords = map[string]TokenType{
-	"func":   FUNCTION,
-	"let":    LET,
-	"true":   TRUE,
-	"false":  FALSE,
-	"if":     IF,
-	"else":   ELSE,
-	"return": RETURN,
+	"func":   Function,
+	"let":    Let,
+	"true":   True,
+	"false":  False,
+	"if":     If,
+	"else":   Else,
+	"return": Return,
 }
 
 // LookupIdentifier checks our keywords map for the scanned keyword. If it finds one, then
@@ -66,5 +69,5 @@ func LookupIdentifier(identifier string) TokenType {
 		return token
 	}
 
-	return IDENTIFIER
+	return Identifier
 }
