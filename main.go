@@ -1,20 +1,26 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
-	"os/user"
 
 	"github.com/bradford-hamilton/monkey-lang/repl"
 )
 
 func main() {
-	user, err := user.Current()
-	if err != nil {
-		panic(err)
+	engine := flag.String("engine", "vm", "Engine options are 'vm' or 'eval'")
+	console := flag.Bool("console", false, "Repl options are true or false")
+	flag.Parse()
+
+	if *engine != "vm" && *engine != "eval" {
+		fmt.Printf("Engine must be either 'vm' or 'eval'. Got %s\n", *engine)
+		return
 	}
 
-	fmt.Printf("Hello %s! This is Monkey Lang.\n", user.Username)
-	fmt.Printf("Feel free to type in commands\n")
-	repl.Start(os.Stdin, os.Stdout)
+	if *console == true {
+		repl.Start(os.Stdin, os.Stdout, engine)
+	} else {
+		fmt.Print("Add ability to pass file path and execute...")
+	}
 }
