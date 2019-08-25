@@ -26,6 +26,8 @@ func main() {
 		return
 	}
 
+	var result object.Object
+
 	if *console {
 		repl.Start(os.Stdin, os.Stdout, engine)
 	} else {
@@ -46,34 +48,36 @@ func main() {
 		program := p.ParseProgram()
 
 		if *engine == "vm" {
-			compileBytecodeAndRun(program)
+			result = compileBytecodeAndRun(program)
 		} else {
-			evaluateAst(program)
+			result = evaluateAst(program)
 		}
+
+		fmt.Println(result.Inspect())
 	}
 }
 
 // Evaluate the AST with evaluator and print result
-func evaluateAst(program *ast.RootNode) {
+func evaluateAst(program *ast.RootNode) object.Object {
 	env := object.NewEnvironment()
-	result := evaluator.Eval(program, env)
-	fmt.Println(result.Inspect())
+	return evaluator.Eval(program, env)
 }
 
-// Compile program to bytecode, pass to VM, and run. Prints the last popped stack element (result)
-func compileBytecodeAndRun(program *ast.RootNode) {
+// Compile program to bytecode, pass to VM, and run. Returns the last popped stack element (result)
+func compileBytecodeAndRun(program *ast.RootNode) object.Object {
 	comp := compiler.New()
+
 	err := comp.Compile(program)
 	if err != nil {
 		fmt.Printf("compiler error: %s", err)
 	}
 
 	vm := vm.New(comp.Bytecode())
+
 	err = vm.Run()
 	if err != nil {
 		fmt.Printf("vm error: %s", err)
 	}
 
-	stackElem := vm.LastPoppedStackElement()
-	fmt.Println(stackElem.Inspect())
+	return vm.LastPoppedStackElement()
 }
