@@ -1,10 +1,15 @@
 # Monkey Lang
 
-Currently extending original tutorial/src code:
-- https://interpreterbook.com
-- https://compilerbook.com
+Currently extending the Monkey programming language designed in [_Writing An Interpreter In Go_](https://interpreterbook.com/) and [_Writing a Compiler in Go_](https://compilerbook.com).
 
-## Running monkey
+## Installation
+Install Monkey using `go get`:
+
+```
+go get -u github.com/bradford-hamilton/monkey-lang
+```
+
+## Usage
 Build
 ```
 go build -o monkey main.go
