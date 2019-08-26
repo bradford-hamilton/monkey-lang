@@ -17,6 +17,7 @@ import (
 )
 
 func main() {
+	// Define and parse flag options
 	engine := flag.String("engine", "vm", "Engine options are \"vm\" or \"eval\"")
 	console := flag.Bool("console", false, "Provide console flag to enter interactive repl")
 	flag.Parse()
@@ -26,8 +27,7 @@ func main() {
 		return
 	}
 
-	var result object.Object
-
+	// If console flag is provided, run interactive console - otherwise read file and execute
 	if *console {
 		repl.Start(os.Stdin, os.Stdout, engine)
 	} else {
@@ -36,8 +36,9 @@ func main() {
 			return
 		}
 
-		filePath := flag.Args()[0]
+		var result object.Object
 
+		filePath := flag.Args()[0]
 		contents, err := ioutil.ReadFile(filePath)
 		if err != nil {
 			fmt.Printf("Failure to read file '%s'. Err: %s", string(contents), err)
@@ -57,7 +58,7 @@ func main() {
 	}
 }
 
-// Evaluate the AST with evaluator and print result
+// Evaluate the AST with evaluator
 func evaluateAst(program *ast.RootNode) object.Object {
 	env := object.NewEnvironment()
 	return evaluator.Eval(program, env)

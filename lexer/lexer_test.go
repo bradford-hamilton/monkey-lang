@@ -33,6 +33,9 @@ if (5 < 10) {
 [1, 2];
 
 {"foo": "bar"}
+
+true && false;
+true || false;
 `
 
 	tests := []struct {
@@ -125,6 +128,14 @@ if (5 < 10) {
 		{token.Colon, ":"},
 		{token.String, "bar"},
 		{token.RightBrace, "}"},
+		{token.True, "true"},
+		{token.And, "&&"},
+		{token.False, "false"},
+		{token.Semicolon, ";"},
+		{token.True, "true"},
+		{token.Or, "||"},
+		{token.False, "false"},
+		{token.Semicolon, ";"},
 		{token.EOF, ""},
 	}
 

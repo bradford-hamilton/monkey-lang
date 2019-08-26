@@ -21,6 +21,8 @@ const (
 	LessEqual    = "<"
 	GreaterEqual = ">"
 	BangEqual    = "!="
+	And          = "&&"
+	Or           = "||"
 
 	// Delimiters
 	Comma        = ","

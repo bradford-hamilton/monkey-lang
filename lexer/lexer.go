@@ -129,6 +129,24 @@ func (l *Lexer) NextToken() token.Token {
 		t = newToken(token.LessEqual, l.char)
 	case '>':
 		t = newToken(token.GreaterEqual, l.char)
+	case '&':
+		if l.peek() == '&' {
+			ch := l.char
+			l.readChar()
+			t = token.Token{
+				Type:    token.And,
+				Literal: string(ch) + string(l.char),
+			}
+		}
+	case '|':
+		if l.peek() == '|' {
+			ch := l.char
+			l.readChar()
+			t = token.Token{
+				Type:    token.Or,
+				Literal: string(ch) + string(l.char),
+			}
+		}
 	case ',':
 		t = newToken(token.Comma, l.char)
 	case ':':
