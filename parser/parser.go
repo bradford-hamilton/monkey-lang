@@ -15,13 +15,14 @@ import (
 // Define operator precedence constants
 const (
 	Lowest      = iota + 1
-	Equals      // ==
+	Equals      // =
+	Logical     // && and ||
 	LessGreater // > or <
 	Sum         // +
 	Product     // *
 	Prefix      // -x or !x
 	Call        // myFunction(x)
-	Index       // array[index]
+	Index       // array[index], hash[key]
 )
 
 // Define operator precedence table
@@ -34,6 +35,8 @@ var precedences = map[token.TokenType]int{
 	token.Minus:        Sum,
 	token.Slash:        Product,
 	token.Star:         Product,
+	token.And:          Logical,
+	token.Or:           Logical,
 	token.LeftParen:    Call,
 	token.LeftBracket:  Index,
 }
@@ -88,6 +91,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.GreaterEqual, p.parseInfixExpression)
 	p.registerInfix(token.LeftParen, p.parseCallExpression)
 	p.registerInfix(token.LeftBracket, p.parseIndexExpr)
+	p.registerInfix(token.And, p.parseInfixExpression)
+	p.registerInfix(token.Or, p.parseInfixExpression)
 
 	// Read two tokens, so currentToken and peekToken are both set.
 	p.nextToken()
