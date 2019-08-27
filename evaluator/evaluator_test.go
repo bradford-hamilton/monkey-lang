@@ -374,7 +374,7 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`len("one", "two")`, "Wrong number of arguments. Got: 2, Expected: 1"},
 		{`len([1, 2, 3])`, 3},
 		{`len([])`, 0},
-		{`puts("hello", "world!")`, nil},
+		{`print("hello", "world!")`, nil},
 		{`first([1, 2, 3])`, 1},
 		{`first([])`, nil},
 		{`first(1)`, "Argument to `first` must be an Array. Got: INTEGER"},

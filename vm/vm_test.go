@@ -437,7 +437,7 @@ func TestBuiltinFunctions(t *testing.T) {
 		},
 		{`len([1, 2, 3])`, 3},
 		{`len([])`, 0},
-		{`puts("hello", "world!")`, Null},
+		{`print("hello", "world!")`, Null},
 		{`first([1, 2, 3])`, 1},
 		{`first([])`, Null},
 		{`first(1)`,

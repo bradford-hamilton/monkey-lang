@@ -6,7 +6,7 @@ import (
 
 var builtinFunctions = map[string]*object.Builtin{
 	"len":   object.GetBuiltinByName("len"),
-	"puts":  object.GetBuiltinByName("puts"),
+	"print": object.GetBuiltinByName("print"),
 	"first": object.GetBuiltinByName("first"),
 	"last":  object.GetBuiltinByName("last"),
 	"rest":  object.GetBuiltinByName("rest"),
