@@ -69,10 +69,12 @@ const (
 	OpTrue
 	OpFalse
 
-	// Comparison
+	// Comparison/Logical
 	OpEqualEqual
 	OpNotEqual
 	OpGreaterThan
+	OpAnd
+	OpOr
 
 	// Prefix/unary
 	OpMinus
@@ -131,6 +133,8 @@ var definitions = map[Opcode]*Definition{
 	OpEqualEqual:    {"OpEqualEqual", []int{}},
 	OpNotEqual:      {"OpNotEqual", []int{}},
 	OpGreaterThan:   {"OpGreaterThan", []int{}},
+	OpAnd:           {"OpAnd", []int{}},
+	OpOr:            {"OpOr", []int{}},
 	OpMinus:         {"OpMinus", []int{}},
 	OpBang:          {"OpBang", []int{}},
 	OpJumpNotTruthy: {"OpJumpNotTruthy", []int{2}},

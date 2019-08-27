@@ -129,6 +129,12 @@ func (vm *VM) Run() error {
 				return err
 			}
 
+		case code.OpAnd, code.OpOr:
+			err := vm.executeLogicalOperator(op)
+			if err != nil {
+				return err
+			}
+
 		case code.OpBang:
 			err := vm.executeBangOperator()
 			if err != nil {
@@ -385,6 +391,21 @@ func (vm *VM) executeComparison(op code.Opcode) error {
 	}
 }
 
+func (vm *VM) executeLogicalOperator(op code.Opcode) error {
+	right := vm.pop()
+	left := vm.pop()
+
+	var result bool
+
+	if op == code.OpAnd {
+		result = coerceObjToNativeBool(left) && coerceObjToNativeBool(right)
+	} else if op == code.OpOr {
+		result = coerceObjToNativeBool(left) || coerceObjToNativeBool(right)
+	}
+
+	return vm.push(nativeBoolToBooleanObj(result))
+}
+
 func (vm *VM) executeIntegerComparison(op code.Opcode, left, right object.Object) error {
 	leftValue := left.(*object.Integer).Value
 	rightValue := right.(*object.Integer).Value
@@ -406,6 +427,31 @@ func nativeBoolToBooleanObj(input bool) *object.Boolean {
 		return True
 	}
 	return False
+}
+
+// Coerce our different object types to booleans for truthy/falsey values
+func coerceObjToNativeBool(o object.Object) bool {
+	// if rv, ok := o.(*object.ReturnValue); ok {
+	// 	o = rv.Value
+	// }
+
+	switch obj := o.(type) {
+	case *object.Boolean:
+
+		return obj.Value
+	case *object.String:
+		return obj.Value != ""
+	case *object.Null:
+		return false
+	case *object.Integer:
+		return obj.Value != 0
+	case *object.Array:
+		return len(obj.Elements) > 0
+	case *object.Hash:
+		return len(obj.Pairs) > 0
+	default:
+		return true
+	}
 }
 
 func (vm *VM) executeBangOperator() error {

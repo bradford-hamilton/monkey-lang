@@ -172,6 +172,10 @@ func (c *Compiler) Compile(node ast.Node) error {
 			c.emit(code.OpEqualEqual)
 		case "!=":
 			c.emit(code.OpNotEqual)
+		case "&&":
+			c.emit(code.OpAnd)
+		case "||":
+			c.emit(code.OpOr)
 		default:
 			return fmt.Errorf("Unknown operator %s", node.Operator)
 		}
