@@ -150,6 +150,30 @@ func nativeBoolToBooleanObj(input bool) *object.Boolean {
 	return False
 }
 
+// Coerce our different object types to booleans for truthy/falsey values
+func coerceObjectToNativeBool(o object.Object) bool {
+	if rv, ok := o.(*object.ReturnValue); ok {
+		o = rv.Value
+	}
+
+	switch obj := o.(type) {
+	case *object.Boolean:
+		return obj.Value
+	case *object.String:
+		return obj.Value != ""
+	case *object.Null:
+		return false
+	case *object.Integer:
+		return obj.Value != 0
+	case *object.Array:
+		return len(obj.Elements) > 0
+	case *object.Hash:
+		return len(obj.Pairs) > 0
+	default:
+		return true
+	}
+}
+
 func evalPrefixExpr(operator string, right object.Object) object.Object {
 	switch operator {
 	case "!":
@@ -194,6 +218,10 @@ func evalInfixExpr(operator string, left, right object.Object) object.Object {
 		return nativeBoolToBooleanObj(left == right)
 	case operator == "!=":
 		return nativeBoolToBooleanObj(left != right)
+	case operator == "&&":
+		return nativeBoolToBooleanObj(coerceObjectToNativeBool(left) && coerceObjectToNativeBool(right))
+	case operator == "||":
+		return nativeBoolToBooleanObj(coerceObjectToNativeBool(left) || coerceObjectToNativeBool(right))
 	case left.Type() != right.Type():
 		return newError("Type mismatch: %s %s %s", left.Type(), operator, right.Type())
 	default:

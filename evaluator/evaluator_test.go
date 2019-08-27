@@ -60,6 +60,20 @@ func TestEvalBooleanExpression(t *testing.T) {
 		{"(1 < 2) == false", false},
 		{"(1 > 2) == true", false},
 		{"(1 > 2) == false", true},
+		{"true && true", true},
+		{"true && false", false},
+		{"false && false", false},
+		{"true || true", true},
+		{"true || false", true},
+		{"false || true", true},
+		{"true && \"\"", false},
+		{"true && \"monkey\"", true},
+		{"true && 0", false},
+		{"true && 1", true},
+		{"true && []", false},
+		{"true && [1, 2]", true},
+		{"true && {}", false},
+		{"true && { \"key\": \"value\" }", true},
 	}
 
 	for _, tt := range tests {
@@ -359,7 +373,7 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`len("one", "two")`, "Wrong number of arguments. Got: 2, Expected: 1"},
 		{`len([1, 2, 3])`, 3},
 		{`len([])`, 0},
-		// {`puts("hello", "world!")`, nil},
+		{`puts("hello", "world!")`, nil},
 		{`first([1, 2, 3])`, 1},
 		{`first([])`, nil},
 		{`first(1)`, "Argument to `first` must be an Array. Got: INTEGER"},
@@ -367,7 +381,7 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`last([])`, nil},
 		{`last(1)`, "Argument to `last` must be an Array. Got: INTEGER"},
 		{`rest([1, 2, 3])`, []int{2, 3}},
-		{`rest([1])`, nil},
+		{`rest([])`, nil},
 		{`rest([])`, nil},
 		{`push([], 1)`, []int{1}},
 		{`push(1, 1)`, "Argument to `push` must be an Array. Got: INTEGER"},
@@ -379,8 +393,8 @@ func TestBuiltinFunctions(t *testing.T) {
 		switch expected := tt.expected.(type) {
 		case int:
 			testIntegerObject(t, evaluated, int64(expected))
-		// case nil:
-		// 	testNullObject(t, evaluated)
+		case nil:
+			testNullObject(t, evaluated)
 		case string:
 			errObj, ok := evaluated.(*object.Error)
 			if !ok {
