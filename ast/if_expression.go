@@ -9,7 +9,7 @@ import (
 // IfExpression - holds the token, the condition expression and the consequence & alternative
 // block statements. Structure: if (<condition>) <consequence> else <alternative>
 type IfExpression struct {
-	Token       token.Token // The IF token
+	Token       token.Token // The If token
 	Condition   Expression
 	Consequence *BlockStatement
 	Alternative *BlockStatement

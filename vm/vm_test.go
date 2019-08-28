@@ -99,6 +99,16 @@ func TestGlobalLetStatements(t *testing.T) {
 	runVMTests(t, tests)
 }
 
+func TestGlobalConstStatements(t *testing.T) {
+	tests := []vmTestCase{
+		{"const one = 1; one", 1},
+		{"const one = 1; const two = 2; one + two", 3},
+		{"const one = 1; const two = one + one; one + two", 3},
+	}
+
+	runVMTests(t, tests)
+}
+
 func TestStringExpressions(t *testing.T) {
 	tests := []vmTestCase{
 		{`"monkey"`, "monkey"},

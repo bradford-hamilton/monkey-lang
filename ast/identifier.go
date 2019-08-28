@@ -4,7 +4,7 @@ import "github.com/bradford-hamilton/monkey-lang/token"
 
 // Identifier - holds IDENTIFIER token and it's value (add, foobar, x, y, ...)
 type Identifier struct {
-	Token token.Token // The token.IDENTIFIER token
+	Token token.Token // The token.Identifier token
 	Value string
 }
 

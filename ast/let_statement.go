@@ -9,7 +9,7 @@ import (
 // LetStatement - Name holds the identifier of the binding and Value for the expression
 // that produces the value.
 type LetStatement struct {
-	Token token.Token // The token.LET token
+	Token token.Token // The token.Let token
 	Name  *Identifier
 	Value Expression
 }

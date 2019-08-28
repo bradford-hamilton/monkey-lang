@@ -19,3 +19,6 @@ if (true && false) {
 
 // Single line comment
 print("Nice") // Or like this
+
+const cantChangeMe = "neat";
+print(cantChangeMe);

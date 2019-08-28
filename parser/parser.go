@@ -122,6 +122,8 @@ func (p *Parser) parseStatement() ast.Statement {
 	switch p.currentToken.Type {
 	case token.Let:
 		return p.parseLetStatement()
+	case token.Const:
+		return p.parseConstStatement()
 	case token.Return:
 		return p.parseReturnStatement()
 	default:
@@ -187,6 +189,37 @@ func (p *Parser) currenTokenPrecedence() int {
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {
 	stmt := &ast.LetStatement{Token: p.currentToken}
+
+	if !p.expectPeekType(token.Identifier) {
+		return nil
+	}
+
+	stmt.Name = &ast.Identifier{
+		Token: p.currentToken,
+		Value: p.currentToken.Literal,
+	}
+
+	if !p.expectPeekType(token.Equal) {
+		return nil
+	}
+
+	p.nextToken()
+
+	stmt.Value = p.parseExpr(Lowest)
+
+	if fl, ok := stmt.Value.(*ast.FunctionLiteral); ok {
+		fl.Name = stmt.Name.Value
+	}
+
+	if p.peekTokenTypeIs(token.Semicolon) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) parseConstStatement() *ast.ConstStatement {
+	stmt := &ast.ConstStatement{Token: p.currentToken}
 
 	if !p.expectPeekType(token.Identifier) {
 		return nil

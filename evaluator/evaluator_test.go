@@ -290,6 +290,22 @@ func TestLetStatements(t *testing.T) {
 	}
 }
 
+func TestConstStatements(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{"const a = 5; a;", 5},
+		{"const a = 5 * 5; a", 25},
+		{"const a = 5; const b = a; b;", 5},
+		{"const a = 5; const b = a; let c = a + b + 5; c", 15},
+	}
+
+	for _, tt := range tests {
+		testIntegerObject(t, testEval(tt.input), tt.expected)
+	}
+}
+
 func TestFunctionObject(t *testing.T) {
 	input := "func(x) { x + 2; };"
 	evaluated := testEval(input)

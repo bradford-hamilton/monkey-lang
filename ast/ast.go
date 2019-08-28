@@ -10,13 +10,13 @@ type Node interface {
 	String() string
 }
 
-// Statement - must provide statementNode and TokenLiteral method. Statements do not produce values.
+// Statement - must provide statementNode, TokenLiteral, and String methods. Statements do not produce values.
 type Statement interface {
 	Node
 	statementNode()
 }
 
-// Expression - must provide expressionNode and TokenLiteral method. Expressions produce values.
+// Expression - must provide expressionNode, TokenLiteral, and String methods. Expressions produce values.
 type Expression interface {
 	Node
 	expressionNode()
