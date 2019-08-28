@@ -380,7 +380,7 @@ func TestBooleanExpression(t *testing.T) {
 	}
 }
 
-func TestIFExpression(t *testing.T) {
+func TestIfExpression(t *testing.T) {
 	input := `if (x < y) { x }`
 	l := lexer.New(input)
 	p := New(l)

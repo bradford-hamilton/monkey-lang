@@ -36,6 +36,11 @@ if (5 < 10) {
 
 true && false;
 true || false;
+
+// This is a comment above the number 10
+10
+
+10 // This is a comment to the right of 10
 `
 
 	tests := []struct {
@@ -136,6 +141,8 @@ true || false;
 		{token.Or, "||"},
 		{token.False, "false"},
 		{token.Semicolon, ";"},
+		{token.Integer, "10"},
+		{token.Integer, "10"},
 		{token.EOF, ""},
 	}
 

@@ -16,3 +16,6 @@ if (true && false) {
 } else {
   print("should happen");
 }
+
+// Single line comment
+print("Nice") // Or like this
