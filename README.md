@@ -2,6 +2,17 @@
 
 Currently extending the Monkey programming language designed in [_Writing An Interpreter In Go_](https://interpreterbook.com/) and [_Writing a Compiler in Go_](https://compilerbook.com).
 
+I will formally document the language and it's features at some point, but for now I'm keeping a list of the additional functionality I've added on top of original design:
+
+1. Ability to execute Monkey files (.mo file ext) in addition to the interative console. This is now the default behavior. Add `--console` flag when executing to drop into the REPL instead.
+2. Both file execution and console usage respond to an `--engine=` flag where you can choose to use the evaluator or the VM.
+3. Logical operators `&&` and `||`
+4. Single line comments starting with `//`
+5. `const` variable declaration (although it only mocks let at this point until I add variable reassignment)
+6. Modulo operator `%`
+
+**Note:** All additional features are added to both the evaluator engine and the bytecode/compiler/VM.
+
 ## Installation
 Install Monkey using `go get`:
 
