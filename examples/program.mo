@@ -22,3 +22,6 @@ print("Nice") // Or like this
 
 const cantChangeMe = "neat";
 print(cantChangeMe);
+
+const moduloResult = (21 % 8) % (8 % 3);
+print(moduloResult);
