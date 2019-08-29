@@ -136,6 +136,8 @@ func (l *Lexer) NextToken() token.Token {
 			return l.NextToken()
 		}
 		t = newToken(token.Slash, l.char)
+	case '%':
+		t = newToken(token.Mod, l.char)
 	case '<':
 		t = newToken(token.LessEqual, l.char)
 	case '>':

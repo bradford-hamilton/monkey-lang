@@ -43,6 +43,8 @@ true || false;
 10 // This is a comment to the right of 10
 
 const cantChangeMe = "neato";
+
+10 % 3;
 `
 
 	tests := []struct {
@@ -149,6 +151,10 @@ const cantChangeMe = "neato";
 		{token.Identifier, "cantChangeMe"},
 		{token.Equal, "="},
 		{token.String, "neato"},
+		{token.Semicolon, ";"},
+		{token.Integer, "10"},
+		{token.Mod, "%"},
+		{token.Integer, "3"},
 		{token.Semicolon, ";"},
 		{token.EOF, ""},
 	}
