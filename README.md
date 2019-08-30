@@ -1,3 +1,8 @@
+[![Build Status](https://travis-ci.org/bradford-hamilton/monkey-lang.svg?branch=master)](https://travis-ci.org/bradford-hamilton/monkey-lang)
+[![Go Report Card](https://goreportcard.com/badge/github.com/bradford-hamilton/monkey-lang)](https://goreportcard.com/report/github.com/bradford-hamilton/monkey-lang)
+[![GoDoc](https://godoc.org/github.com/bradford-hamilton/monkey-lang?status.svg)](https://godoc.org/github.com/bradford-hamilton/monkey-lang)
+[![codecov](https://codecov.io/gh/bradford-hamilton/monkey-lang/branch/master/graph/badge.svg)](https://codecov.io/gh/bradford-hamilton/monkey-lang)
+
 # Monkey Lang
 
 Currently extending the Monkey programming language designed in [_Writing An Interpreter In Go_](https://interpreterbook.com/) and [_Writing a Compiler in Go_](https://compilerbook.com).
