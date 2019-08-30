@@ -3,6 +3,9 @@ package object
 import (
 	"fmt"
 	"testing"
+
+	"github.com/bradford-hamilton/monkey-lang/ast"
+	"github.com/bradford-hamilton/monkey-lang/token"
 )
 
 func TestStringHashKey(t *testing.T) {
@@ -26,15 +29,9 @@ func TestStringHashKey(t *testing.T) {
 
 func TestArray(t *testing.T) {
 	elements := []Object{
-		&Integer{
-			Value: 1,
-		},
-		&Integer{
-			Value: 2,
-		},
-		&Integer{
-			Value: 3,
-		},
+		&Integer{Value: 1},
+		&Integer{Value: 2},
+		&Integer{Value: 3},
 	}
 	arr := &Array{Elements: elements}
 
@@ -48,25 +45,21 @@ func TestArray(t *testing.T) {
 }
 
 func TestBoolean(t *testing.T) {
-	b := &Boolean{Value: true}
+	b := &Boolean{}
 
 	if b.Type() != BooleanObj {
 		t.Errorf("b.Type() returned wrong type. Expected: BooleanObj. Got: %s", b.Type())
 	}
 
-	if b.Inspect() != "true" {
-		t.Errorf("arr.Inspect() returned wrong string representation. Expected: true. Got: %s", b.Inspect())
+	if b.Inspect() != "false" {
+		t.Errorf("arr.Inspect() returned wrong string representation. Expected: false. Got: %s", b.Inspect())
 	}
 }
 
 func TestClosure(t *testing.T) {
 	cl := &Closure{
-		Fn: &CompiledFunction{
-			Instructions:  []byte("OpDoesntMatter"),
-			NumLocals:     1,
-			NumParameters: 1,
-		},
-		Free: []Object{&Integer{Value: 8}},
+		Fn:   &CompiledFunction{},
+		Free: []Object{},
 	}
 
 	if cl.Type() != ClosureObj {
@@ -91,5 +84,99 @@ func TestCompiledFunction(t *testing.T) {
 
 	if cf.Inspect() != fmt.Sprintf("CompiledFunction[%p]", cf) {
 		t.Errorf("cf.Inspect() returned wrong string representation. Expected: CompiledFunction[%p]. Got: %s", cf, cf.Inspect())
+	}
+}
+
+func TestErrors(t *testing.T) {
+	e := &Error{
+		Message: "Uh oh spaghettio",
+	}
+
+	if e.Type() != ErrorObj {
+		t.Errorf("e.Type() returned wrong type. Expected: ErrorObj. Got: %s", e.Type())
+	}
+
+	if e.Inspect() != "Error: Uh oh spaghettio" {
+		t.Errorf("e.Inspect() returned wrong string representation. Expected: Error: Uh oh spaghettio. Got: %s", e.Inspect())
+	}
+}
+
+func TestFunctions(t *testing.T) {
+	f := &Function{
+		Parameters: []*ast.Identifier{
+			&ast.Identifier{
+				Token: token.Token{
+					Type: token.String,
+				},
+				Value: "arg1",
+			},
+		},
+		Body: &ast.BlockStatement{
+			Token: token.Token{Type: token.String, Literal: "let"},
+			Statements: []ast.Statement{
+				&ast.LetStatement{
+					Token: token.Token{Type: token.String, Literal: "let"},
+					Name:  &ast.Identifier{Value: "waaat"},
+					Value: &ast.StringLiteral{Token: token.Token{Literal: "thing"}},
+				},
+			},
+		},
+		Env: &Environment{},
+	}
+
+	if f.Type() != FunctionObj {
+		t.Errorf("f.Type() returned wrong type. Expected: FunctionObj. Got: %s", f.Type())
+	}
+
+	if f.Inspect() != "func(arg1) {\nlet waaat = thing;\n" {
+		t.Errorf("f.Inspect() returned wrong string representation. Expected:\n func(arg1) {\nlet waaat = thing;\n. Got:\n %s", f.Inspect())
+	}
+}
+
+func TestIntegers(t *testing.T) {
+	integer := &Integer{Value: 666}
+
+	if integer.Type() != IntegerObj {
+		t.Errorf("integer.Type() returned wrong type. Expected: IntegerObj. Got: %s", integer.Type())
+	}
+
+	if integer.Inspect() != "666" {
+		t.Errorf("integer.Inspect() returned wrong string representation. Expected: 666. Got: %s", integer.Inspect())
+	}
+}
+
+func TestNull(t *testing.T) {
+	n := &Null{}
+
+	if n.Type() != NullObj {
+		t.Errorf("n.Type() returned wrong type. Expected: NullObj. Got: %s", n.Type())
+	}
+
+	if n.Inspect() != "null" {
+		t.Errorf("n.Inspect() returned wrong string representation. Expected: null. Got: %s", n.Inspect())
+	}
+}
+
+func TestReturnValues(t *testing.T) {
+	rv := &ReturnValue{Value: &String{Value: "im a returned string"}}
+
+	if rv.Type() != ReturnValueObj {
+		t.Errorf("n.Type() returned wrong type. Expected: ReturnValueObj. Got: %s", rv.Type())
+	}
+
+	if rv.Inspect() != "im a returned string" {
+		t.Errorf("n.Inspect() returned wrong string representation. Expected: im a returned string. Got: %s", rv.Inspect())
+	}
+}
+
+func TestStrings(t *testing.T) {
+	s := &String{Value: "thurman merman"}
+
+	if s.Type() != StringObj {
+		t.Errorf("n.Type() returned wrong type. Expected: StringObj. Got: %s", s.Type())
+	}
+
+	if s.Inspect() != "thurman merman" {
+		t.Errorf("n.Inspect() returned wrong string representation. Expected: thurman merman. Got: %s", s.Inspect())
 	}
 }
