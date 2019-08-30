@@ -41,7 +41,7 @@ type VM struct {
 }
 
 // New initializers and returns a pointer to a VM. It takes bytecode and sets the bytecode's instructions
-// and constants to the VM, creates a new stack with StackSize number of elements, and initalizes the ip to 0
+// and constants to the VM, creates a new stack with StackSize number of elements, and initializes the ip to 0
 func New(bytecode *compiler.Bytecode) *VM {
 	mainFn := &object.CompiledFunction{Instructions: bytecode.Instructions}
 	mainClosure := &object.Closure{Fn: mainFn}

@@ -6,7 +6,7 @@ import (
 )
 
 // Frame - Data structure that holds execution-relevant information. Short for "call frame" or "stack frame"
-// and sometimes "activation record". On real machines a frame is not something seperate from, but a designated
+// and sometimes "activation record". On real machines a frame is not something separate from, but a designated
 // part of "the stack". It's where the return address, the arguments to the current function, and it's local
 // variables are stored. In VM land we don't have to use the stack. We're not constrained by standardized
 // calling conventions and other much too real things, like real memory addresses and locations. Since we can
