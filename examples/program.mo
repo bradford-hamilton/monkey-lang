@@ -25,3 +25,9 @@ print(cantChangeMe);
 
 const moduloResult = (21 % 8) % (8 % 3);
 print(moduloResult);
+
+const fullName = func(firstName, lastName) {
+  return firstName + " " + lastName;
+}
+
+print(fullName("Thurman", "Murman"));

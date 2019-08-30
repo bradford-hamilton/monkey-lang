@@ -50,7 +50,7 @@ func (ins Instructions) fmtInstruction(def *Definition, operands []int) string {
 	return fmt.Sprintf("ERROR: unhandled operandCount for %s\n", def.Name)
 }
 
-// Opcode is merely a byte
+// Opcode is a type alias for byte
 type Opcode byte
 
 // Define our opcode types
