@@ -237,11 +237,6 @@ func TestBuiltins(t *testing.T) {
 		t.Errorf("b.Inspect() returned wrong string representation. Expected: builtin function. Got: %s", b.Inspect())
 	}
 
-	lenBuiltin := GetBuiltinByName("len")
-	if lenBuiltin == nil {
-		t.Errorf("GetBuiltinByName(\"len\") did not return len builtin")
-	}
-
 	notABuiltin := GetBuiltinByName("notABuiltin")
 	if notABuiltin != nil {
 		t.Errorf("GetBuiltinByName(\"notABuiltin\") should have return nil")
@@ -250,5 +245,131 @@ func TestBuiltins(t *testing.T) {
 	err := newError("Message with %s %s", "format", "verbs")
 	if err.Message != "Message with format verbs" {
 		t.Errorf("newError returned wrong error string. Expected: 'Message with format verbs'. Got: %s", err.Message)
+	}
+}
+
+func TestLen(t *testing.T) {
+	arr := &Array{Elements: []Object{
+		&Integer{Value: 1},
+		&Integer{Value: 2},
+		&Integer{Value: 3},
+	}}
+	str := &String{Value: "neat string"}
+	null := &Null{}
+
+	lenBuiltin := GetBuiltinByName("len")
+	if lenBuiltin.Fn(str, null).Inspect() != "Error: Wrong number of arguments. Got: 2, Expected: 1" {
+		t.Errorf("len builtin returned wrong result. Expected: Error: Wrong number of arguments. Got: 2, Expected: 1. Got: %s", lenBuiltin.Fn(null).Inspect())
+	}
+	if lenBuiltin.Fn(arr).Inspect() != "3" {
+		t.Errorf("len builtin returned wrong result. Expected: 3. Got: %s", lenBuiltin.Fn(arr).Inspect())
+	}
+	if lenBuiltin.Fn(str).Inspect() != "11" {
+		t.Errorf("len builtin returned wrong result. Expected: 11. Got: %s", lenBuiltin.Fn(str).Inspect())
+	}
+	if lenBuiltin.Fn(null).Inspect() != "Error: Argument to `len` not supported. Got: NULL" {
+		t.Errorf("len builtin returned wrong result. Expected: Error: Argument to `len` not supported. Got: NULL. Got: %s", lenBuiltin.Fn(null).Inspect())
+	}
+}
+
+func TestPrint(t *testing.T) {
+	str := &String{Value: "neat string"}
+
+	printBuiltin := GetBuiltinByName("print")
+	if printBuiltin.Fn(str) != nil {
+		t.Errorf("print builtin should print its arguments and return nil. Returned: %s", printBuiltin.Fn(str))
+	}
+}
+
+func TestFirst(t *testing.T) {
+	arr := &Array{Elements: []Object{
+		&Integer{Value: 99},
+		&Integer{Value: 7},
+		&Integer{Value: 356},
+	}}
+	emptyArr := &Array{}
+	str := &String{Value: "neat string"}
+
+	firstBuiltin := GetBuiltinByName("first")
+	if firstBuiltin.Fn(arr, arr).Inspect() != "Error: Wrong number of arguments. Got: 2, Expected: 1" {
+		t.Errorf("first builtin returned wrong result. Expected: Error: Wrong number of arguments. Got: 2, Expected: 1. Got: %s", firstBuiltin.Fn(str).Inspect())
+	}
+	if firstBuiltin.Fn(str).Inspect() != "Error: Argument to `first` must be an Array. Got: STRING" {
+		t.Errorf("first builtin returned wrong result. Expected: Error: Argument to `first` must be an Array. Got: STRING. Got: %s", firstBuiltin.Fn(str).Inspect())
+	}
+	if firstBuiltin.Fn(arr).Inspect() != "99" {
+		t.Errorf("first builtin returned wrong result. Expected: 99. Got: %s", firstBuiltin.Fn(arr).Inspect())
+	}
+	if firstBuiltin.Fn(emptyArr) != nil {
+		t.Errorf("first builtin returned wrong result. Expected: nil. Got: %s", firstBuiltin.Fn(arr).Inspect())
+	}
+}
+
+func TestLast(t *testing.T) {
+	arr := &Array{Elements: []Object{
+		&Integer{Value: 99},
+		&Integer{Value: 7},
+		&Integer{Value: 356},
+	}}
+	emptyArr := &Array{}
+	str := &String{Value: "neat string"}
+
+	lastBuiltin := GetBuiltinByName("last")
+	if lastBuiltin.Fn(arr, arr).Inspect() != "Error: Wrong number of arguments. Got: 2, Expected: 1" {
+		t.Errorf("last builtin returned wrong result. Expected: Error: Wrong number of arguments. Got: 2, Expected: 1. Got: %s", lastBuiltin.Fn(str).Inspect())
+	}
+	if lastBuiltin.Fn(str).Inspect() != "Error: Argument to `last` must be an Array. Got: STRING" {
+		t.Errorf("last builtin returned wrong result. Expected: Error: Argument to `last` must be an Array. Got: STRING. Got: %s", lastBuiltin.Fn(str).Inspect())
+	}
+	if lastBuiltin.Fn(arr).Inspect() != "356" {
+		t.Errorf("last builtin returned wrong result. Expected: 356. Got: %s", lastBuiltin.Fn(arr).Inspect())
+	}
+	if lastBuiltin.Fn(emptyArr) != nil {
+		t.Errorf("last builtin returned wrong result. Expected: nil. Got: %s", lastBuiltin.Fn(arr).Inspect())
+	}
+}
+
+func TestRest(t *testing.T) {
+	arr := &Array{Elements: []Object{
+		&Integer{Value: 99},
+		&Integer{Value: 7},
+		&Integer{Value: 356},
+	}}
+	emptyArr := &Array{}
+	str := &String{Value: "neat string"}
+
+	restBuiltin := GetBuiltinByName("rest")
+	if restBuiltin.Fn(arr, arr).Inspect() != "Error: Wrong number of arguments. Got: 2, Expected: 1" {
+		t.Errorf("rest builtin returned wrong result. Expected: Error: Wrong number of arguments. Got: 2, Expected: 1. Got: %s", restBuiltin.Fn(str).Inspect())
+	}
+	if restBuiltin.Fn(str).Inspect() != "Error: Argument to `rest` must be an Array. Got: STRING" {
+		t.Errorf("rest builtin returned wrong result. Expected: Error: Argument to `rest` must be an Array. Got: STRING. Got: %s", restBuiltin.Fn(str).Inspect())
+	}
+	if restBuiltin.Fn(arr).Inspect() != "[7, 356]" {
+		t.Errorf("rest builtin returned wrong result. Expected: [7, 356]. Got: %s", restBuiltin.Fn(arr).Inspect())
+	}
+	if restBuiltin.Fn(emptyArr) != nil {
+		t.Errorf("rest builtin returned wrong result. Expected: nil. Got: %s", restBuiltin.Fn(arr).Inspect())
+	}
+}
+
+func TestPush(t *testing.T) {
+	arr := &Array{Elements: []Object{
+		&Integer{Value: 99},
+		&Integer{Value: 7},
+		&Integer{Value: 356},
+	}}
+	newEl := &Integer{Value: 666}
+	str := &String{Value: "neat string"}
+
+	pushBuiltin := GetBuiltinByName("push")
+	if pushBuiltin.Fn(arr).Inspect() != "Error: Wrong number of arguments. Got: 1, Expected: 2" {
+		t.Errorf("push builtin returned wrong result. Expected: Error: Wrong number of arguments. Got: 2, Expected: 1. Got: %s", pushBuiltin.Fn(str).Inspect())
+	}
+	if pushBuiltin.Fn(str, str).Inspect() != "Error: Argument to `push` must be an Array. Got: STRING" {
+		t.Errorf("push builtin returned wrong result. Expected: Error: Argument to `push` must be an Array. Got: STRING. Got: %s", pushBuiltin.Fn(str).Inspect())
+	}
+	if pushBuiltin.Fn(arr, newEl).Inspect() != "[99, 7, 356, 666]" {
+		t.Errorf("push builtin returned wrong result. Expected: [99, 7, 356, 666]. Got: %s", pushBuiltin.Fn(arr, newEl).Inspect())
 	}
 }
