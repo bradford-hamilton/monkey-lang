@@ -1,7 +1,8 @@
 [![Build Status](https://travis-ci.org/bradford-hamilton/monkey-lang.svg?branch=master)](https://travis-ci.org/bradford-hamilton/monkey-lang)
 [![Go Report Card](https://goreportcard.com/badge/github.com/bradford-hamilton/monkey-lang)](https://goreportcard.com/report/github.com/bradford-hamilton/monkey-lang)
-[![GoDoc](https://godoc.org/github.com/bradford-hamilton/monkey-lang?status.svg)](https://godoc.org/github.com/bradford-hamilton/monkey-lang)
 [![codecov](https://codecov.io/gh/bradford-hamilton/monkey-lang/branch/master/graph/badge.svg)](https://codecov.io/gh/bradford-hamilton/monkey-lang)
+[![GoDoc](https://godoc.org/github.com/bradford-hamilton/monkey-lang?status.svg)](https://godoc.org/github.com/bradford-hamilton/monkey-lang)
+[![Go 1.11.5](https://img.shields.io/badge/go-1.11.5-9cf.svg)](https://golang.org/dl/)
 
 # Monkey Lang
 
