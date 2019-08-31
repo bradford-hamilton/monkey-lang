@@ -27,6 +27,28 @@ func TestStringHashKey(t *testing.T) {
 	}
 }
 
+func TestHash(t *testing.T) {
+	h := &Hash{
+		Pairs: map[HashKey]HashPair{
+			HashKey{
+				Type:  StringObj,
+				Value: 1,
+			}: HashPair{
+				Key:   &String{Value: "monkey"},
+				Value: &String{Value: "lang"},
+			},
+		},
+	}
+
+	if h.Type() != HashObj {
+		t.Errorf("integer.Type() returned wrong type. Expected: HashObj. Got: %s", h.Type())
+	}
+
+	if h.Inspect() != "{monkey: lang}" {
+		t.Errorf("h.Inspect() returned wrong string representation. Expected: {monkey: lang}. Got: %s", h.Inspect())
+	}
+}
+
 func TestArray(t *testing.T) {
 	elements := []Object{
 		&Integer{Value: 1},
@@ -178,5 +200,28 @@ func TestStrings(t *testing.T) {
 
 	if s.Inspect() != "thurman merman" {
 		t.Errorf("n.Inspect() returned wrong string representation. Expected: thurman merman. Got: %s", s.Inspect())
+	}
+}
+
+func TestEnvironments(t *testing.T) {
+	env := NewEnclosedEnvironment(NewEnvironment())
+
+	env.Set("innerKey", &String{Value: "innerValue"})
+	env.outer.Set("outerKey", &String{Value: "outerValue"})
+
+	obj, ok := env.Get("innerKey")
+	if !ok {
+		t.Errorf("Failure to retrieve key in env")
+	}
+	if obj.Inspect() != "innerValue" {
+		t.Errorf("Expected 'innerValue'. Got: %s", obj.Inspect())
+	}
+
+	obj, ok = env.Get("outerKey")
+	if !ok {
+		t.Errorf("Failure to retrieve key in env")
+	}
+	if obj.Inspect() != "outerValue" {
+		t.Errorf("Expected 'outerValue'. Got: %s", obj.Inspect())
 	}
 }
