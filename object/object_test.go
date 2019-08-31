@@ -225,3 +225,30 @@ func TestEnvironments(t *testing.T) {
 		t.Errorf("Expected 'outerValue'. Got: %s", obj.Inspect())
 	}
 }
+
+func TestBuiltins(t *testing.T) {
+	b := &Builtin{}
+
+	if b.Type() != BuiltinObj {
+		t.Errorf("b.Type() returned wrong type. Expected: BuiltinObj. Got: %s", b.Type())
+	}
+
+	if b.Inspect() != "builtin function" {
+		t.Errorf("b.Inspect() returned wrong string representation. Expected: builtin function. Got: %s", b.Inspect())
+	}
+
+	lenBuiltin := GetBuiltinByName("len")
+	if lenBuiltin == nil {
+		t.Errorf("GetBuiltinByName(\"len\") did not return len builtin")
+	}
+
+	notABuiltin := GetBuiltinByName("notABuiltin")
+	if notABuiltin != nil {
+		t.Errorf("GetBuiltinByName(\"notABuiltin\") should have return nil")
+	}
+
+	err := newError("Message with %s %s", "format", "verbs")
+	if err.Message != "Message with format verbs" {
+		t.Errorf("newError returned wrong error string. Expected: 'Message with format verbs'. Got: %s", err.Message)
+	}
+}
