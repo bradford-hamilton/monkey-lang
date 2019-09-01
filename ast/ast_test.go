@@ -6,7 +6,7 @@ import (
 	"github.com/bradford-hamilton/monkey-lang/token"
 )
 
-func TestString(t *testing.T) {
+func TestRootNode(t *testing.T) {
 	program := &RootNode{
 		Statements: []Statement{
 			&LetStatement{
@@ -22,9 +22,18 @@ func TestString(t *testing.T) {
 			},
 		},
 	}
+	emptyProgram := &RootNode{}
+
+	if program.TokenLiteral() != "let" {
+		t.Errorf("program.TokenLiteral() wrong. Expected: 'let'. Got: %q", program.TokenLiteral())
+	}
 
 	if program.String() != "let myVar = anotherVar;" {
 		t.Errorf("program.String() wrong. Got: %q", program.String())
+	}
+
+	if emptyProgram.TokenLiteral() != "" {
+		t.Errorf("emptyProgram.String() wrong. Expected \"\" Got: %q", program.String())
 	}
 }
 
@@ -154,6 +163,7 @@ func TestExpressionStatement(t *testing.T) {
 			Value: 1000,
 		},
 	}
+	blankExpr := &ExpressionStatement{}
 
 	if es.TokenLiteral() != "1000" {
 		t.Errorf("Wrong TokenLiteral for ExpressionStatement. Expected: '1000'. Got: %s", es.TokenLiteral())
@@ -161,6 +171,10 @@ func TestExpressionStatement(t *testing.T) {
 
 	if es.String() != "1000" {
 		t.Errorf("Wrong String representation for ExpressionStatement. Expected: '1000'. Got: %s", es.String())
+	}
+
+	if blankExpr.String() != "" {
+		t.Errorf("Wrong String representation for empty ExpressionStatement. Expected: empty string \" \". Got: %s", es.String())
 	}
 }
 
@@ -247,5 +261,200 @@ func TestIdentifier(t *testing.T) {
 
 	if ident.String() != "monkey" {
 		t.Errorf("Wrong String representation for Identifier. Expected: 'monkey'. Got: %s", ident.String())
+	}
+}
+
+func TestIfExpression(t *testing.T) {
+	ie := &IfExpression{
+		Token: token.Token{Type: token.If, Literal: "if"},
+		Condition: &Boolean{
+			Token: token.Token{Type: token.True, Literal: "true"},
+			Value: true,
+		},
+		Consequence: &BlockStatement{
+			Token: token.Token{Type: token.LeftBrace, Literal: "{"},
+			Statements: []Statement{
+				&ConstStatement{
+					Token: token.Token{Type: token.Const, Literal: "const"},
+					Name: &Identifier{
+						Token: token.Token{Type: token.String, Literal: "whenTrue"},
+						Value: "whenTrue",
+					},
+					Value: &Boolean{
+						Token: token.Token{Type: token.Integer, Literal: "true"},
+						Value: true,
+					},
+				},
+			},
+		},
+		Alternative: &BlockStatement{
+			Token: token.Token{Type: token.LeftBrace, Literal: "{"},
+			Statements: []Statement{
+				&ConstStatement{
+					Token: token.Token{Type: token.Const, Literal: "const"},
+					Name: &Identifier{
+						Token: token.Token{Type: token.String, Literal: "whenFalse"},
+						Value: "whenFalse",
+					},
+					Value: &Boolean{
+						Token: token.Token{Type: token.Integer, Literal: "false"},
+						Value: false,
+					},
+				},
+			},
+		},
+	}
+
+	if ie.TokenLiteral() != "if" {
+		t.Errorf("Wrong TokenLiteral for IfExpression. Expected: 'if'. Got: %s", ie.TokenLiteral())
+	}
+
+	if ie.String() != "if true const whenTrue = true; else const whenFalse = false;" {
+		t.Errorf("Wrong String representation for IfExpression. Expected: 'if true const whenTrue = true; else const whenFalse = false;'. Got: %s", ie.String())
+	}
+}
+
+func TestIndexExpression(t *testing.T) {
+	arrLit := &ArrayLiteral{
+		Token: token.Token{Type: token.LeftBracket, Literal: "["},
+		Elements: []Expression{
+			&IntegerLiteral{
+				Token: token.Token{Type: token.Integer, Literal: "8"},
+				Value: 8,
+			},
+			&IntegerLiteral{
+				Token: token.Token{Type: token.Integer, Literal: "13"},
+				Value: 13,
+			},
+		},
+	}
+
+	ie := &IndexExpression{
+		Token: token.Token{Type: token.LeftBracket, Literal: "["},
+		Left:  arrLit,
+		Index: &IntegerLiteral{
+			Token: token.Token{Type: token.Integer, Literal: "0"},
+			Value: 0,
+		},
+	}
+
+	if ie.TokenLiteral() != "[" {
+		t.Errorf("Wrong TokenLiteral for IndexExpression. Expected: '['. Got: %s", ie.TokenLiteral())
+	}
+
+	if ie.String() != "([8, 13][0])" {
+		t.Errorf("Wrong String representation for IndexExpression. Expected: '([8, 13][0])'. Got: %s", ie.String())
+	}
+}
+
+func TestInfixExpression(t *testing.T) {
+	ie := &InfixExpression{
+		Token: token.Token{Type: token.Plus, Literal: "+"},
+		Left: &IntegerLiteral{
+			Token: token.Token{Type: token.Integer, Literal: "5"},
+			Value: 5,
+		},
+		Operator: "+",
+		Right: &IntegerLiteral{
+			Token: token.Token{Type: token.Integer, Literal: "10"},
+			Value: 10,
+		},
+	}
+
+	if ie.TokenLiteral() != "+" {
+		t.Errorf("Wrong TokenLiteral for InfixExpression. Expected: '+'. Got: %s", ie.TokenLiteral())
+	}
+
+	if ie.String() != "(5 + 10)" {
+		t.Errorf("Wrong String representation for InfixExpression. Expected: '(5 + 10)'. Got: %s", ie.String())
+	}
+}
+
+func TestIntegerLiteral(t *testing.T) {
+	il := &IntegerLiteral{
+		Token: token.Token{Type: token.Integer, Literal: "10"},
+		Value: 10,
+	}
+
+	if il.TokenLiteral() != "10" {
+		t.Errorf("Wrong TokenLiteral for IntegerLiteral. Expected: '10'. Got: %s", il.TokenLiteral())
+	}
+
+	if il.String() != "10" {
+		t.Errorf("Wrong String representation for IntegerLiteral. Expected: '10'. Got: %s", il.String())
+	}
+}
+
+func TestLetStatement(t *testing.T) {
+	cs := &LetStatement{
+		Token: token.Token{Type: token.Let, Literal: "let"},
+		Name: &Identifier{
+			Token: token.Token{Type: token.String, Literal: "monkey"},
+			Value: "monkey",
+		},
+		Value: &Identifier{
+			Token: token.Token{Type: token.String, Literal: "lang"},
+			Value: "lang",
+		},
+	}
+
+	if cs.TokenLiteral() != "let" {
+		t.Errorf("Wrong TokenLiteral for LetStatement. Expected: 'let'. Got: %s", cs.TokenLiteral())
+	}
+
+	if cs.String() != "let monkey = lang;" {
+		t.Errorf("Wrong String representation for LetStatement. Expected: 'let monkey = lang;'. Got: %s", cs.String())
+	}
+}
+
+func TestPrefixExpression(t *testing.T) {
+	pe := &PrefixExpression{
+		Token: token.Token{Type: token.Minus, Literal: "-"},
+		Right: &IntegerLiteral{
+			Token: token.Token{Type: token.Integer, Literal: "5"},
+			Value: 5,
+		},
+		Operator: "-",
+	}
+
+	if pe.TokenLiteral() != "-" {
+		t.Errorf("Wrong TokenLiteral for PrefixExpression. Expected: '-'. Got: %s", pe.TokenLiteral())
+	}
+
+	if pe.String() != "(-5)" {
+		t.Errorf("Wrong String representation for PrefixExpression. Expected: '(-5)'. Got: %s", pe.String())
+	}
+}
+
+func TestReturnStatement(t *testing.T) {
+	rs := &ReturnStatement{
+		Token: token.Token{Type: token.Return, Literal: "return"},
+		ReturnValue: &StringLiteral{
+			Token: token.Token{Type: token.String, Literal: "monkeys"},
+			Value: "monkeys",
+		},
+	}
+
+	if rs.TokenLiteral() != "return" {
+		t.Errorf("Wrong TokenLiteral for ReturnStatement. Expected: 'return'. Got: %s", rs.TokenLiteral())
+	}
+
+	if rs.String() != "return monkeys;" {
+		t.Errorf("Wrong String representation for ReturnStatement. Expected: 'return monkeys;'. Got: %s", rs.String())
+	}
+}
+
+func TestStringLiteral(t *testing.T) {
+	sl := &StringLiteral{
+		Token: token.Token{Type: token.String, Literal: "this string is so literal"},
+		Value: "this string is so literal",
+	}
+
+	if sl.TokenLiteral() != "this string is so literal" {
+		t.Errorf("Wrong TokenLiteral for StringLiteral. Expected: 'this string is so literal'. Got: %s", sl.TokenLiteral())
+	}
+
+	if sl.String() != "this string is so literal" {
+		t.Errorf("Wrong String representation for StringLiteral. Expected: 'this string is so literal'. Got: %s", sl.String())
 	}
 }
