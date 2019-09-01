@@ -1,7 +1,7 @@
 language: go
 
 go:
-- 1.11.5
+- 1.12.9
 
 script: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
