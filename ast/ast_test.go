@@ -426,6 +426,21 @@ func TestPrefixExpression(t *testing.T) {
 	}
 }
 
+func TestPostfixExpression(t *testing.T) {
+	pe := &PostfixExpression{
+		Token:    token.Token{Type: token.Identifier, Literal: "someVar"},
+		Operator: "++",
+	}
+
+	if pe.TokenLiteral() != "someVar" {
+		t.Errorf("Wrong TokenLiteral for PostfixExpression. Expected: 'someVar'. Got: %s", pe.TokenLiteral())
+	}
+
+	if pe.String() != "(someVar++)" {
+		t.Errorf("Wrong String representation for PostfixExpression. Expected: '(someVar++)'. Got: %s", pe.String())
+	}
+}
+
 func TestReturnStatement(t *testing.T) {
 	rs := &ReturnStatement{
 		Token: token.Token{Type: token.Return, Literal: "return"},
