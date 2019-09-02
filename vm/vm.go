@@ -147,6 +147,12 @@ func (vm *VM) Run() error {
 				return err
 			}
 
+		case code.OpPlusPlus, code.OpMinusMinus:
+			err := vm.executePostfixOperator(op, ins, ip)
+			if err != nil {
+				return err
+			}
+
 		case code.OpJump:
 			pos := int(code.ReadUint16(ins[ip+1:]))
 			vm.currentFrame().ip = pos - 1
@@ -482,6 +488,36 @@ func (vm *VM) executeMinusOperator() error {
 	value := operand.(*object.Integer).Value
 
 	return vm.push(&object.Integer{Value: -value})
+}
+
+func (vm *VM) executePostfixOperator(op code.Opcode, ins code.Instructions, ip int) error {
+	// Get the operand, must be an integer identifier
+	operand := vm.pop()
+	if operand.Type() != object.IntegerObj {
+		return fmt.Errorf("Invalid left-hand side expression in postfix operation: %s", operand.Type())
+	}
+
+	// Increment or decrement the operand based on opcode
+	if op == code.OpPlusPlus {
+		operand.(*object.Integer).Value++
+	} else {
+		operand.(*object.Integer).Value--
+	}
+
+	// Based on whether the operand was a global or local binding, set the new
+	// updated operand appropriately
+	if code.Opcode(ins[ip-3]) == code.OpGetGlobal {
+		globalIndex := code.ReadUint16(ins[ip-5:])
+		vm.currentFrame().ip++
+		vm.globals[globalIndex] = operand
+	} else if code.Opcode(ins[ip-2]) == code.OpGetLocal {
+		localIndex := code.ReadUint8(ins[ip-3:])
+		vm.currentFrame().ip++
+		frame := vm.currentFrame()
+		vm.stack[frame.basePointer+int(localIndex)] = operand
+	}
+
+	return nil
 }
 
 func (vm *VM) buildArray(startIndex, endIndex int) object.Object {

@@ -208,6 +208,27 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return fmt.Errorf("Unknown operator %s", node.Operator)
 		}
 
+	case *ast.PostfixExpression:
+		symbol, ok := c.symbolTable.Resolve(node.TokenLiteral())
+		if !ok {
+			return fmt.Errorf("Undefined variable %s", node.TokenLiteral())
+		}
+
+		if symbol.Scope == GlobalScope {
+			c.emit(code.OpGetGlobal, symbol.Index)
+		} else {
+			c.emit(code.OpGetLocal, symbol.Index)
+		}
+
+		switch node.Operator {
+		case "++":
+			c.emit(code.OpPlusPlus)
+		case "--":
+			c.emit(code.OpMinusMinus)
+		default:
+			return fmt.Errorf("Unknown operator %s", node.Operator)
+		}
+
 	case *ast.IfExpression:
 		err := c.Compile(node.Condition)
 		if err != nil {

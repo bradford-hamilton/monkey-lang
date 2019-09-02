@@ -143,6 +143,12 @@ func (p *Parser) parseStatement() ast.Statement {
 }
 
 func (p *Parser) parseIdentifier() ast.Expression {
+	postfix := p.postfixParseFuncs[p.peekToken.Type]
+	if postfix != nil {
+		p.nextToken()
+		return postfix()
+	}
+
 	return &ast.Identifier{
 		Token: p.currentToken,
 		Value: p.currentToken.Literal,
@@ -287,11 +293,6 @@ func (p *Parser) parseExprStatement() *ast.ExpressionStatement {
 }
 
 func (p *Parser) parseExpr(precedence int) ast.Expression {
-	postfix := p.postfixParseFuncs[p.currentToken.Type]
-	if postfix != nil {
-		return postfix()
-	}
-
 	prefix := p.prefixParseFuncs[p.currentToken.Type]
 	if prefix == nil {
 		p.noPrefixParseFuncError(p.currentToken.Type)

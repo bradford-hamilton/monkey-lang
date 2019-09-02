@@ -255,12 +255,11 @@ func TestParsingInfixExpressions(t *testing.T) {
 
 func TestParsingPostfixExpressions(t *testing.T) {
 	postfixTests := []struct {
-		input        string
-		operator     string
-		integerValue interface{}
+		input    string
+		operator string
 	}{
-		{"five++", "++", 5},
-		{"five--", "--", 5},
+		{"five++", "++"},
+		{"five--", "--"},
 	}
 
 	for _, tt := range postfixTests {
@@ -269,13 +268,13 @@ func TestParsingPostfixExpressions(t *testing.T) {
 		program := p.ParseProgram()
 		checkParserErrors(t, p)
 
-		if len(program.Statements) != 2 {
-			t.Fatalf("program.Statements does not contain %d statements. Got: %d", 2, len(program.Statements))
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statements does not contain %d statements. Got: %d", 1, len(program.Statements))
 		}
 
-		stmt, ok := program.Statements[1].(*ast.ExpressionStatement)
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
 		if !ok {
-			t.Fatalf("program.Statements[1] is not an *ast.ExpressionStatement. Got: %T", program.Statements[1])
+			t.Fatalf("program.Statements[0] is not an *ast.ExpressionStatement. Got: %T", program.Statements[0])
 		}
 
 		postfixExpr, ok := stmt.Expression.(*ast.PostfixExpression)

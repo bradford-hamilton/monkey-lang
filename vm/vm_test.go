@@ -96,6 +96,8 @@ func TestGlobalLetStatements(t *testing.T) {
 		{"let one = 1; one", 1},
 		{"let one = 1; let two = 2; one + two", 3},
 		{"let one = 1; let two = one + one; one + two", 3},
+		{"let one = 1; one++; one;", 2},
+		{"let one = 1; one--; one;", 0},
 	}
 
 	runVMTests(t, tests)
@@ -218,6 +220,13 @@ func TestFunctionsWithReturnStatement(t *testing.T) {
 				earlyExit();
 		`,
 			expected: 99,
+		},
+		{
+			input: `
+				let postfixReturn = func() { let one = 1; one++; return one };
+				postfixReturn();
+		`,
+			expected: 2,
 		},
 	}
 
@@ -726,7 +735,7 @@ func testIntegerObject(expected int64, actual object.Object) error {
 	}
 
 	if result.Value != expected {
-		return fmt.Errorf("object has wrong value. Expected: %d. Got: %d", result.Value, expected)
+		return fmt.Errorf("object has wrong value. Expected: %d. Got: %d", expected, result.Value)
 	}
 
 	return nil
@@ -739,7 +748,7 @@ func testBooleanObject(expected bool, actual object.Object) error {
 	}
 
 	if result.Value != expected {
-		return fmt.Errorf("Object has wrong value. Expected: %t, Got: %t", result.Value, expected)
+		return fmt.Errorf("Object has wrong value. Expected: %t, Got: %t", expected, result.Value)
 	}
 
 	return nil
@@ -752,7 +761,7 @@ func testStringObject(expected string, actual object.Object) error {
 	}
 
 	if result.Value != expected {
-		return fmt.Errorf("Object has wrong value. Got: %q. Expected: %q", result.Value, expected)
+		return fmt.Errorf("Object has wrong value. Expected: %q. Got: %q", expected, result.Value)
 	}
 
 	return nil

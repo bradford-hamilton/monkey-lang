@@ -16,8 +16,7 @@ I will formally document the language and it's features at some point, but for n
 4. Single line comments starting with `//`
 5. `const` variable declaration (although it only mocks let at this point until I add variable reassignment)
 6. Modulo operator `%`
-
-**Note:** All additional features are added to both the evaluator engine and the bytecode/compiler/VM.
+7. Postfix operators `++` and `--`
 
 ## Installation
 Install Monkey using `go get`:

@@ -81,6 +81,10 @@ const (
 	OpMinus
 	OpBang
 
+	// Postfix/unary
+	OpPlusPlus
+	OpMinusMinus
+
 	// Jump for conditionals
 	OpJumpNotTruthy // Jump to alternative if consequence is not truthy
 	OpJump          // Jump no matter what (if we evaluate consequence and dont want the alternative)
@@ -139,6 +143,8 @@ var definitions = map[Opcode]*Definition{
 	OpOr:            {"OpOr", []int{}},
 	OpMinus:         {"OpMinus", []int{}},
 	OpBang:          {"OpBang", []int{}},
+	OpPlusPlus:      {"OpPlusPlus", []int{}},
+	OpMinusMinus:    {"OpMinusMinus", []int{}},
 	OpJumpNotTruthy: {"OpJumpNotTruthy", []int{2}},
 	OpJump:          {"OpJump", []int{2}},
 	OpNull:          {"OpNull", []int{}},

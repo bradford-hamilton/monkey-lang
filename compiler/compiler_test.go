@@ -93,6 +93,41 @@ func TestIntegerArithmatic(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
+func TestPostfixIncrementAndDecrement(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input: `
+				let one = 1;
+				one++;
+			`,
+			expectedConstants: []interface{}{1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpPlusPlus),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input: `
+				let one = 1;
+				one--;
+			`,
+			expectedConstants: []interface{}{1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpSetGlobal, 0),
+				code.Make(code.OpGetGlobal, 0),
+				code.Make(code.OpMinusMinus),
+				code.Make(code.OpPop),
+			},
+		},
+	}
+
+	runCompilerTests(t, tests)
+}
+
 func TestBooleanExpressions(t *testing.T) {
 	tests := []compilerTestCase{
 		{
@@ -209,7 +244,7 @@ func TestConditionals(t *testing.T) {
 	tests := []compilerTestCase{
 		{
 			input: `
-			if (true) { 10 }; 3333;
+				if (true) { 10 }; 3333;
 			`,
 			expectedConstants: []interface{}{10, 3333},
 			expectedInstructions: []code.Instructions{
@@ -233,7 +268,7 @@ func TestConditionals(t *testing.T) {
 		},
 		{
 			input: `
-			if (true) { 10 } else { 20 }; 3333;
+				if (true) { 10 } else { 20 }; 3333;
 			`,
 			expectedConstants: []interface{}{10, 20, 3333},
 			expectedInstructions: []code.Instructions{
@@ -264,8 +299,8 @@ func TestGlobalLetStatements(t *testing.T) {
 	tests := []compilerTestCase{
 		{
 			input: `
-			let one = 1;
-			let two = 2;
+				let one = 1;
+				let two = 2;
 			`,
 			expectedConstants: []interface{}{1, 2},
 			expectedInstructions: []code.Instructions{
@@ -277,8 +312,8 @@ func TestGlobalLetStatements(t *testing.T) {
 		},
 		{
 			input: `
-			let one = 1;
-			one;
+				let one = 1;
+				one;
 			`,
 			expectedConstants: []interface{}{1},
 			expectedInstructions: []code.Instructions{
@@ -290,9 +325,9 @@ func TestGlobalLetStatements(t *testing.T) {
 		},
 		{
 			input: `
-			let one = 1;
-			let two = one;
-			two;
+				let one = 1;
+				let two = one;
+				two;
 			`,
 			expectedConstants: []interface{}{1},
 			expectedInstructions: []code.Instructions{
@@ -313,8 +348,8 @@ func TestGlobalConstStatements(t *testing.T) {
 	tests := []compilerTestCase{
 		{
 			input: `
-			const one = 1;
-			const two = 2;
+				const one = 1;
+				const two = 2;
 			`,
 			expectedConstants: []interface{}{1, 2},
 			expectedInstructions: []code.Instructions{
@@ -326,8 +361,8 @@ func TestGlobalConstStatements(t *testing.T) {
 		},
 		{
 			input: `
-			const one = 1;
-			one;
+				const one = 1;
+				one;
 			`,
 			expectedConstants: []interface{}{1},
 			expectedInstructions: []code.Instructions{
@@ -339,9 +374,9 @@ func TestGlobalConstStatements(t *testing.T) {
 		},
 		{
 			input: `
-			const one = 1;
-			const two = one;
-			two;
+				const one = 1;
+				const two = one;
+				two;
 			`,
 			expectedConstants: []interface{}{1},
 			expectedInstructions: []code.Instructions{

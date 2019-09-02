@@ -31,3 +31,23 @@ const fullName = func(firstName, lastName) {
 }
 
 print(fullName("Thurman", "Murman"));
+
+let anotherGlobalNum = 55;
+anotherGlobalNum++;
+print(anotherGlobalNum);
+
+let postfixPlusFunc = func() {
+  let localNum = 99;
+  localNum++;
+  return localNum;
+}
+
+print(postfixPlusFunc());
+
+let postfixMinusFunc = func() {
+  let localNum = 99;
+  localNum--;
+  return localNum;
+}
+
+print(postfixMinusFunc());
