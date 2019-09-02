@@ -45,6 +45,9 @@ true || false;
 const cantChangeMe = "neato";
 
 10 % 3;
+
+five++
+five--
 `
 
 	tests := []struct {
@@ -156,6 +159,10 @@ const cantChangeMe = "neato";
 		{token.Mod, "%"},
 		{token.Integer, "3"},
 		{token.Semicolon, ";"},
+		{token.Identifier, "five"},
+		{token.PlusPlus, "++"},
+		{token.Identifier, "five"},
+		{token.MinusMinus, "--"},
 		{token.EOF, ""},
 	}
 

@@ -116,9 +116,27 @@ func (l *Lexer) NextToken() token.Token {
 			t = newToken(token.Equal, l.char)
 		}
 	case '+':
-		t = newToken(token.Plus, l.char)
+		if l.peek() == '+' {
+			ch := l.char
+			l.readChar()
+			t = token.Token{
+				Type:    token.PlusPlus,
+				Literal: string(ch) + string(l.char),
+			}
+		} else {
+			t = newToken(token.Plus, l.char)
+		}
 	case '-':
-		t = newToken(token.Minus, l.char)
+		if l.peek() == '-' {
+			ch := l.char
+			l.readChar()
+			t = token.Token{
+				Type:    token.MinusMinus,
+				Literal: string(ch) + string(l.char),
+			}
+		} else {
+			t = newToken(token.Minus, l.char)
+		}
 	case '!':
 		if l.peek() == '=' {
 			ch := l.char

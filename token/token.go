@@ -13,7 +13,9 @@ const (
 	// Operators
 	Equal        = "="
 	Plus         = "+"
+	PlusPlus     = "++"
 	Minus        = "-"
+	MinusMinus   = "--"
 	Star         = "*"
 	Slash        = "/"
 	Mod          = "%"

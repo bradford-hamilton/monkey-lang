@@ -79,6 +79,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 		return evalInfixExpr(node.Operator, left, right)
 
+	case *ast.PostfixExpression:
+		return evalPostfixExpr(env, node.Operator, node)
+
 	case *ast.IfExpression:
 		return evalIfExpr(node, env)
 
@@ -228,6 +231,43 @@ func evalMinusPrefixOperatorExpr(right object.Object) object.Object {
 	value := right.(*object.Integer).Value
 
 	return &object.Integer{Value: -value}
+}
+
+func evalPostfixExpr(env *object.Environment, operator string, node *ast.PostfixExpression) object.Object {
+	switch operator {
+	case "++":
+		val, ok := env.Get(node.Token.Literal)
+		if !ok {
+			return newError("Token literal %s is unknown", node.Token.Literal)
+		}
+
+		arg, ok := val.(*object.Integer)
+		if !ok {
+			return newError("Invalid left-hand side expression in postfix operation")
+		}
+
+		v := arg.Value
+		env.Set(node.Token.Literal, &object.Integer{Value: v + 1})
+		return arg
+
+	case "--":
+		val, ok := env.Get(node.Token.Literal)
+		if !ok {
+			return newError("Token literal %s is unknown", node.Token.Literal)
+		}
+
+		arg, ok := val.(*object.Integer)
+		if !ok {
+			return newError("Invalid left-hand side expression in postfix operation")
+		}
+
+		v := arg.Value
+		env.Set(node.Token.Literal, &object.Integer{Value: v - 1})
+		return arg
+
+	default:
+		return newError("Unknown operator: %s", operator)
+	}
 }
 
 func evalInfixExpr(operator string, left, right object.Object) object.Object {

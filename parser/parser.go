@@ -44,20 +44,24 @@ var precedences = map[token.TokenType]int{
 }
 
 type (
-	prefixParseFunc func() ast.Expression
-	infixParseFunc  func(ast.Expression) ast.Expression
+	prefixParseFunc  func() ast.Expression
+	infixParseFunc   func(ast.Expression) ast.Expression
+	postfixParseFunc func() ast.Expression
 )
 
-// Parser holds a Lexer, the currentToken, and the peekToken
+// Parser holds a Lexer, its errors, the currentToken, peekToken (next token), and
+// prevToken (used for ++ and --), as well as the prefix/infix/postfix functions
 type Parser struct {
 	lexer  *lexer.Lexer
 	errors []string
 
 	currentToken token.Token
 	peekToken    token.Token
+	prevToken    token.Token
 
-	prefixParseFuncs map[token.TokenType]prefixParseFunc
-	infixParseFuncs  map[token.TokenType]infixParseFunc
+	prefixParseFuncs  map[token.TokenType]prefixParseFunc
+	infixParseFuncs   map[token.TokenType]infixParseFunc
+	postfixParseFuncs map[token.TokenType]postfixParseFunc
 }
 
 // New takes a Lexer, creates a Parser with that Lexer, sets the current and
@@ -96,6 +100,10 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.LeftBracket, p.parseIndexExpr)
 	p.registerInfix(token.And, p.parseInfixExpression)
 	p.registerInfix(token.Or, p.parseInfixExpression)
+
+	p.postfixParseFuncs = make(map[token.TokenType]postfixParseFunc)
+	p.registerPostfix(token.PlusPlus, p.parsePostfixExpression)
+	p.registerPostfix(token.MinusMinus, p.parsePostfixExpression)
 
 	// Read two tokens, so currentToken and peekToken are both set.
 	p.nextToken()
@@ -142,6 +150,7 @@ func (p *Parser) parseIdentifier() ast.Expression {
 }
 
 func (p *Parser) nextToken() {
+	p.prevToken = p.currentToken
 	p.currentToken = p.peekToken
 	p.peekToken = p.lexer.NextToken()
 }
@@ -268,7 +277,6 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 
 func (p *Parser) parseExprStatement() *ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{Token: p.currentToken}
-
 	stmt.Expression = p.parseExpr(Lowest)
 
 	if p.peekTokenTypeIs(token.Semicolon) {
@@ -279,6 +287,11 @@ func (p *Parser) parseExprStatement() *ast.ExpressionStatement {
 }
 
 func (p *Parser) parseExpr(precedence int) ast.Expression {
+	postfix := p.postfixParseFuncs[p.currentToken.Type]
+	if postfix != nil {
+		return postfix()
+	}
+
 	prefix := p.prefixParseFuncs[p.currentToken.Type]
 	if prefix == nil {
 		p.noPrefixParseFuncError(p.currentToken.Type)
@@ -574,12 +587,23 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	return expr
 }
 
+func (p *Parser) parsePostfixExpression() ast.Expression {
+	return &ast.PostfixExpression{
+		Token:    p.prevToken,
+		Operator: p.currentToken.Literal,
+	}
+}
+
 func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFunc) {
 	p.prefixParseFuncs[tokenType] = fn
 }
 
 func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFunc) {
 	p.infixParseFuncs[tokenType] = fn
+}
+
+func (p *Parser) registerPostfix(tokenType token.TokenType, fn postfixParseFunc) {
+	p.postfixParseFuncs[tokenType] = fn
 }
 
 func (p *Parser) noPrefixParseFuncError(t token.TokenType) {
