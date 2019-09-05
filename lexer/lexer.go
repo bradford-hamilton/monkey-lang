@@ -91,6 +91,25 @@ func (l *Lexer) skipSingleLineComment() {
 	l.skipWhitespace()
 }
 
+func (l *Lexer) skipMultiLineComment() {
+	endFound := false
+
+	for !endFound {
+		if l.char == 0 {
+			endFound = true
+		}
+
+		if l.char == '*' && l.peek() == '/' {
+			endFound = true
+			l.readChar()
+		}
+
+		l.readChar()
+	}
+
+	l.skipWhitespace()
+}
+
 func (l *Lexer) peek() byte {
 	if l.readPosition >= len(l.input) {
 		return 0
@@ -151,6 +170,10 @@ func (l *Lexer) NextToken() token.Token {
 	case '/':
 		if l.peek() == '/' {
 			l.skipSingleLineComment()
+			return l.NextToken()
+		}
+		if l.peek() == '*' {
+			l.skipMultiLineComment()
 			return l.NextToken()
 		}
 		t = newToken(token.Slash, l.char)

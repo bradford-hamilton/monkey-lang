@@ -52,7 +52,13 @@ let postfixMinusFunc = func() {
 
 print(postfixMinusFunc());
 
+/*
+  ignored multiline comment print("will not print")
+*/
+
 print(5 >= 5)
 print(5 <= 5)
 print(5 > 5)
 print(5 < 5)
+
+/* ignored multiline comment */

@@ -15,7 +15,7 @@ let add = func(x, y) {
 };
 let result = add(five, ten);
 
-!-/*5;
+!-*/5;
 5 < 10 > 5;
 
 if (5 < 10) {
@@ -29,6 +29,8 @@ if (5 < 10) {
 
 "foobar"
 "foo bar"
+
+/* multiline comment */
 
 [1, 2];
 
@@ -51,6 +53,10 @@ five--
 
 5 >= 5;
 5 <= 5;
+
+/*
+	multiline comment
+*/
 `
 
 	tests := []struct {
@@ -95,8 +101,8 @@ five--
 		{token.Semicolon, ";"},
 		{token.Bang, "!"},
 		{token.Minus, "-"},
-		{token.Slash, "/"},
 		{token.Star, "*"},
+		{token.Slash, "/"},
 		{token.Integer, "5"},
 		{token.Semicolon, ";"},
 		{token.Integer, "5"},

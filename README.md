@@ -14,10 +14,11 @@ I will formally document the language and it's features at some point, but for n
 2. Both file execution and console usage respond to an `--engine=` flag where you can choose to use the evaluator or the VM.
 3. Logical operators `&&` and `||`
 4. Single line comments starting with `//`
-5. `const` variable declaration (although it only mocks let at this point until I add variable reassignment)
-6. Modulo operator `%`
-7. Postfix operators `++` and `--`
-8. Comparison operators `>=` and `<=`
+5. Multi line comments using `/* */`
+6. `const` variable declaration (although it only mocks let at this point until I add variable reassignment)
+7. Modulo operator `%`
+8. Postfix operators `++` and `--`
+9. Comparison operators `>=` and `<=`
 
 ## Installation
 Install Monkey using `go get`:
