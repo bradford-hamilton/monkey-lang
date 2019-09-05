@@ -17,6 +17,7 @@ I will formally document the language and it's features at some point, but for n
 5. `const` variable declaration (although it only mocks let at this point until I add variable reassignment)
 6. Modulo operator `%`
 7. Postfix operators `++` and `--`
+8. Comparison operators `>=` and `<=`
 
 ## Installation
 Install Monkey using `go get`:
