@@ -123,7 +123,7 @@ func (vm *VM) Run() error {
 				return err
 			}
 
-		case code.OpEqualEqual, code.OpNotEqual, code.OpGreaterThan:
+		case code.OpEqualEqual, code.OpNotEqual, code.OpGreater, code.OpGreaterEqual:
 			err := vm.executeComparison(op)
 			if err != nil {
 				return err
@@ -424,8 +424,10 @@ func (vm *VM) executeIntegerComparison(op code.Opcode, left, right object.Object
 		return vm.push(nativeBoolToBooleanObj(rightValue == leftValue))
 	case code.OpNotEqual:
 		return vm.push(nativeBoolToBooleanObj(rightValue != leftValue))
-	case code.OpGreaterThan:
+	case code.OpGreater:
 		return vm.push(nativeBoolToBooleanObj(leftValue > rightValue))
+	case code.OpGreaterEqual:
+		return vm.push(nativeBoolToBooleanObj(leftValue >= rightValue))
 	default:
 		return fmt.Errorf("Unknown operator: %d", op)
 	}

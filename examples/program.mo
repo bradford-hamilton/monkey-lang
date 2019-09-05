@@ -51,3 +51,8 @@ let postfixMinusFunc = func() {
 }
 
 print(postfixMinusFunc());
+
+print(5 >= 5)
+print(5 <= 5)
+print(5 > 5)
+print(5 < 5)

@@ -48,6 +48,9 @@ const cantChangeMe = "neato";
 
 five++
 five--
+
+5 >= 5;
+5 <= 5;
 `
 
 	tests := []struct {
@@ -97,15 +100,15 @@ five--
 		{token.Integer, "5"},
 		{token.Semicolon, ";"},
 		{token.Integer, "5"},
-		{token.LessEqual, "<"},
+		{token.Less, "<"},
 		{token.Integer, "10"},
-		{token.GreaterEqual, ">"},
+		{token.Greater, ">"},
 		{token.Integer, "5"},
 		{token.Semicolon, ";"},
 		{token.If, "if"},
 		{token.LeftParen, "("},
 		{token.Integer, "5"},
-		{token.LessEqual, "<"},
+		{token.Less, "<"},
 		{token.Integer, "10"},
 		{token.RightParen, ")"},
 		{token.LeftBrace, "{"},
@@ -163,6 +166,14 @@ five--
 		{token.PlusPlus, "++"},
 		{token.Identifier, "five"},
 		{token.MinusMinus, "--"},
+		{token.Integer, "5"},
+		{token.GreaterEqual, ">="},
+		{token.Integer, "5"},
+		{token.Semicolon, ";"},
+		{token.Integer, "5"},
+		{token.LessEqual, "<="},
+		{token.Integer, "5"},
+		{token.Semicolon, ";"},
 		{token.EOF, ""},
 	}
 

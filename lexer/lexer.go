@@ -43,7 +43,7 @@ func (l *Lexer) readString() string {
 	return l.input[position:l.position]
 }
 
-func newToken(tokenType token.TokenType, char byte) token.Token {
+func newToken(tokenType token.TokenType, char ...byte) token.Token {
 	return token.Token{
 		Type:    tokenType,
 		Literal: string(char),
@@ -157,26 +157,32 @@ func (l *Lexer) NextToken() token.Token {
 	case '%':
 		t = newToken(token.Mod, l.char)
 	case '<':
-		t = newToken(token.LessEqual, l.char)
+		if l.peek() == '=' {
+			ch := l.char
+			l.readChar()
+			t = newToken(token.LessEqual, ch, l.char)
+		} else {
+			t = newToken(token.Less, l.char)
+		}
 	case '>':
-		t = newToken(token.GreaterEqual, l.char)
+		if l.peek() == '=' {
+			ch := l.char
+			l.readChar()
+			t = newToken(token.GreaterEqual, ch, l.char)
+		} else {
+			t = newToken(token.Greater, l.char)
+		}
 	case '&':
 		if l.peek() == '&' {
 			ch := l.char
 			l.readChar()
-			t = token.Token{
-				Type:    token.And,
-				Literal: string(ch) + string(l.char),
-			}
+			t = newToken(token.And, ch, l.char)
 		}
 	case '|':
 		if l.peek() == '|' {
 			ch := l.char
 			l.readChar()
-			t = token.Token{
-				Type:    token.Or,
-				Literal: string(ch) + string(l.char),
-			}
+			t = newToken(token.Or, ch, l.char)
 		}
 	case ',':
 		t = newToken(token.Comma, l.char)

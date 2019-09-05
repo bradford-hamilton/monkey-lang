@@ -30,6 +30,8 @@ const (
 var precedences = map[token.TokenType]int{
 	token.EqualEqual:   Equals,
 	token.BangEqual:    Equals,
+	token.Less:         LessGreater,
+	token.Greater:      LessGreater,
 	token.LessEqual:    LessGreater,
 	token.GreaterEqual: LessGreater,
 	token.Plus:         Sum,
@@ -94,6 +96,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.Mod, p.parseInfixExpression)
 	p.registerInfix(token.EqualEqual, p.parseInfixExpression)
 	p.registerInfix(token.BangEqual, p.parseInfixExpression)
+	p.registerInfix(token.Less, p.parseInfixExpression)
+	p.registerInfix(token.Greater, p.parseInfixExpression)
 	p.registerInfix(token.LessEqual, p.parseInfixExpression)
 	p.registerInfix(token.GreaterEqual, p.parseInfixExpression)
 	p.registerInfix(token.LeftParen, p.parseCallExpression)

@@ -339,6 +339,10 @@ func evalIntegerInfixExpr(operator string, left, right object.Object) object.Obj
 		return nativeBoolToBooleanObj(leftVal < rightVal)
 	case ">":
 		return nativeBoolToBooleanObj(leftVal > rightVal)
+	case "<=":
+		return nativeBoolToBooleanObj(leftVal <= rightVal)
+	case ">=":
+		return nativeBoolToBooleanObj(leftVal >= rightVal)
 	case "==":
 		return nativeBoolToBooleanObj(leftVal == rightVal)
 	case "!=":
