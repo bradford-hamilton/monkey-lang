@@ -62,3 +62,10 @@ print(5 > 5)
 print(5 < 5)
 
 /* ignored multiline comment */
+
+print("string comparison below should print true true true")
+const one = "one"
+const two = "two"
+print("monkey" == "monkey")
+print("monkey" != "lang")
+print(one != two)

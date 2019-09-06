@@ -60,6 +60,8 @@ func TestEvalBooleanExpression(t *testing.T) {
 		{"true == false", false},
 		{"true != false", true},
 		{"false != true", true},
+		{"\"monkey\" == \"monkey\"", true},
+		{"\"lang\" != \"langs\"", true},
 		{"(1 < 2) == true", true},
 		{"(1 < 2) == false", false},
 		{"(1 > 2) == true", false},

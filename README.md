@@ -19,6 +19,7 @@ I will formally document the language and it's features at some point, but for n
 7. Modulo operator `%`
 8. Postfix operators `++` and `--`
 9. Comparison operators `>=` and `<=`
+10. String comparisons using `!=` and `==`
 
 ## Installation
 Install Monkey using `go get`:
