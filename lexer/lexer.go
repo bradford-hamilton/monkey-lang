@@ -6,16 +6,16 @@ import (
 
 // Lexer performs our lexical analysis/scanning
 type Lexer struct {
-	input        string
+	input        []rune
 	position     int  // current position in input (points to current char)
 	readPosition int  // current reading position in input (after current char)
-	char         byte // current char under examination
+	char         rune // current char under examination
 	line         int
 }
 
 // New creates and returns a pointer to the Lexer
 func New(input string) *Lexer {
-	l := &Lexer{input: input}
+	l := &Lexer{input: []rune(input)}
 	l.readChar()
 	return l
 }
@@ -41,21 +41,21 @@ func (l *Lexer) readString() string {
 			break
 		}
 	}
-	return l.input[position:l.position]
+	return string(l.input[position:l.position])
 }
 
-func newToken(tokenType token.TokenType, char ...byte) token.Token {
+func newToken(tokenType token.TokenType, char ...rune) token.Token {
 	return token.Token{
 		Type:    tokenType,
 		Literal: string(char),
 	}
 }
 
-func isLetter(char byte) bool {
+func isLetter(char rune) bool {
 	return 'a' <= char && char <= 'z' || 'A' <= char && char <= 'Z' || char == '_'
 }
 
-func isInteger(char byte) bool {
+func isInteger(char rune) bool {
 	return '0' <= char && char <= '9'
 }
 
@@ -66,7 +66,7 @@ func (l *Lexer) readIdentifier() string {
 		l.readChar()
 	}
 
-	return l.input[position:l.position]
+	return string(l.input[position:l.position])
 }
 
 func (l *Lexer) readInteger() string {
@@ -76,7 +76,7 @@ func (l *Lexer) readInteger() string {
 		l.readChar()
 	}
 
-	return l.input[position:l.position]
+	return string(l.input[position:l.position])
 }
 
 func (l *Lexer) skipWhitespace() {
@@ -114,7 +114,7 @@ func (l *Lexer) skipMultiLineComment() {
 	l.skipWhitespace()
 }
 
-func (l *Lexer) peek() byte {
+func (l *Lexer) peek() rune {
 	if l.readPosition >= len(l.input) {
 		return 0
 	}
