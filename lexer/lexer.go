@@ -10,6 +10,7 @@ type Lexer struct {
 	position     int  // current position in input (points to current char)
 	readPosition int  // current reading position in input (after current char)
 	char         byte // current char under examination
+	line         int
 }
 
 // New creates and returns a pointer to the Lexer
@@ -80,6 +81,9 @@ func (l *Lexer) readInteger() string {
 
 func (l *Lexer) skipWhitespace() {
 	for l.char == ' ' || l.char == '\t' || l.char == '\n' || l.char == '\r' {
+		if l.char == '\n' {
+			l.line++
+		}
 		l.readChar()
 	}
 }
