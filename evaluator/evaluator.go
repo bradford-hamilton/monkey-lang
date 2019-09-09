@@ -66,7 +66,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if isError(right) {
 			return right
 		}
-		return evalPrefixExpr(node.Operator, right)
+		return evalPrefixExpr(node.Operator, right, node.Token.Line)
 
 	case *ast.InfixExpression:
 		left := Eval(node.Left, env)
@@ -77,7 +77,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if isError(right) {
 			return right
 		}
-		return evalInfixExpr(node.Operator, left, right)
+		return evalInfixExpr(node.Operator, left, right, node.Token.Line)
 
 	case *ast.PostfixExpression:
 		return evalPostfixExpr(env, node.Operator, node)
@@ -106,7 +106,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if len(args) == 1 && isError(args[0]) {
 			return args[0]
 		}
-		return applyFunction(fn, args)
+		return applyFunction(fn, args, node.Token.Line)
 
 	case *ast.ArrayLiteral:
 		elements := evalExprs(node.Elements, env)
@@ -124,7 +124,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if isError(index) {
 			return index
 		}
-		return evalIndexExpr(left, index)
+		return evalIndexExpr(left, index, node.Token.Line)
 
 	case *ast.HashLiteral:
 		return evalHashLiteral(node, env)
@@ -199,14 +199,14 @@ func coerceObjToNativeBool(o object.Object) bool {
 	}
 }
 
-func evalPrefixExpr(operator string, right object.Object) object.Object {
+func evalPrefixExpr(operator string, right object.Object, line int) object.Object {
 	switch operator {
 	case "!":
 		return evalBangOperatorExpr(right)
 	case "-":
-		return evalMinusPrefixOperatorExpr(right)
+		return evalMinusPrefixOperatorExpr(right, line)
 	default:
-		return newError("Unknown operator: %s%s", operator, right.Type())
+		return newError("Line %d: Unknown operator: %s%s", line, operator, right.Type())
 	}
 }
 
@@ -223,9 +223,9 @@ func evalBangOperatorExpr(right object.Object) object.Object {
 	}
 }
 
-func evalMinusPrefixOperatorExpr(right object.Object) object.Object {
+func evalMinusPrefixOperatorExpr(right object.Object, line int) object.Object {
 	if right.Type() != object.IntegerObj {
-		return newError("Unknown operator: -%s", right.Type())
+		return newError("Line %d: Unknown operator: -%s", line, right.Type())
 	}
 
 	value := right.(*object.Integer).Value
@@ -238,12 +238,12 @@ func evalPostfixExpr(env *object.Environment, operator string, node *ast.Postfix
 	case "++":
 		val, ok := env.Get(node.Token.Literal)
 		if !ok {
-			return newError("Token literal %s is unknown", node.Token.Literal)
+			return newError("Line %d: Token literal %s is unknown", node.Token.Line, node.Token.Literal)
 		}
 
 		arg, ok := val.(*object.Integer)
 		if !ok {
-			return newError("Invalid left-hand side expression in postfix operation")
+			return newError("Line %d: Invalid left-hand side expression in postfix operation", node.Token.Line)
 		}
 
 		v := arg.Value
@@ -253,12 +253,12 @@ func evalPostfixExpr(env *object.Environment, operator string, node *ast.Postfix
 	case "--":
 		val, ok := env.Get(node.Token.Literal)
 		if !ok {
-			return newError("Token literal %s is unknown", node.Token.Literal)
+			return newError("Line %d: Token literal %s is unknown", node.Token.Line, node.Token.Literal)
 		}
 
 		arg, ok := val.(*object.Integer)
 		if !ok {
-			return newError("Invalid left-hand side expression in postfix operation")
+			return newError("Line %d: Invalid left-hand side expression in postfix operation", node.Token.Line)
 		}
 
 		v := arg.Value
@@ -266,16 +266,16 @@ func evalPostfixExpr(env *object.Environment, operator string, node *ast.Postfix
 		return arg
 
 	default:
-		return newError("Unknown operator: %s", operator)
+		return newError("Line %d: Unknown operator: %s", node.Token.Line, operator)
 	}
 }
 
-func evalInfixExpr(operator string, left, right object.Object) object.Object {
+func evalInfixExpr(operator string, left, right object.Object, line int) object.Object {
 	switch {
 	case left.Type() == object.IntegerObj && right.Type() == object.IntegerObj:
-		return evalIntegerInfixExpr(operator, left, right)
+		return evalIntegerInfixExpr(operator, left, right, line)
 	case left.Type() == object.StringObj && right.Type() == object.StringObj:
-		return evalStringInfixExpr(operator, left, right)
+		return evalStringInfixExpr(operator, left, right, line)
 	case operator == "==":
 		return nativeBoolToBooleanObj(left == right)
 	case operator == "!=":
@@ -285,10 +285,10 @@ func evalInfixExpr(operator string, left, right object.Object) object.Object {
 	case operator == "||":
 		return nativeBoolToBooleanObj(coerceObjToNativeBool(left) || coerceObjToNativeBool(right))
 	case left.Type() != right.Type():
-		return newError("Type mismatch: %s %s %s", left.Type(), operator, right.Type())
+		return newError("Line %d: Type mismatch: %s %s %s", line, left.Type(), operator, right.Type())
 	default:
 		fmt.Printf("%s %s %s", left.Type(), operator, right.Type())
-		return newError("Unknown operator: %s %s %s", left.Type(), operator, right.Type())
+		return newError("Line %d: Unknown operator: %s %s %s", line, left.Type(), operator, right.Type())
 	}
 }
 
@@ -320,7 +320,7 @@ func isTruthy(obj object.Object) bool {
 	}
 }
 
-func evalIntegerInfixExpr(operator string, left, right object.Object) object.Object {
+func evalIntegerInfixExpr(operator string, left, right object.Object, line int) object.Object {
 	leftVal := left.(*object.Integer).Value
 	rightVal := right.(*object.Integer).Value
 
@@ -348,11 +348,11 @@ func evalIntegerInfixExpr(operator string, left, right object.Object) object.Obj
 	case "!=":
 		return nativeBoolToBooleanObj(leftVal != rightVal)
 	default:
-		return newError("Unknown operator: %s %s %s", left.Type(), operator, right.Type())
+		return newError("Line %d: Unknown operator: %s %s %s", line, left.Type(), operator, right.Type())
 	}
 }
 
-func evalStringInfixExpr(operator string, left, right object.Object) object.Object {
+func evalStringInfixExpr(operator string, left, right object.Object, line int) object.Object {
 	leftVal := left.(*object.String).Value
 	rightVal := right.(*object.String).Value
 
@@ -364,7 +364,7 @@ func evalStringInfixExpr(operator string, left, right object.Object) object.Obje
 	case "!=":
 		return nativeBoolToBooleanObj(leftVal != rightVal)
 	default:
-		return newError("Unknown operator: %s %s %s", left.Type(), operator, right.Type())
+		return newError("Line %d: Unknown operator: %s %s %s", line, left.Type(), operator, right.Type())
 	}
 
 }
@@ -378,17 +378,17 @@ func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object
 		return builtinFn
 	}
 
-	return newError("Identifier not found: " + node.Value)
+	return newError("Line %d: Identifier not found: %s", node.Token.Line, node.Value)
 }
 
-func evalIndexExpr(left, index object.Object) object.Object {
+func evalIndexExpr(left, index object.Object, line int) object.Object {
 	switch {
 	case left.Type() == object.ArrayObj && index.Type() == object.IntegerObj:
 		return evalArrayIndexExpr(left, index)
 	case left.Type() == object.HashObj:
-		return evalHashIndexExpr(left, index)
+		return evalHashIndexExpr(left, index, line)
 	default:
-		return newError("Index operator not supported: %s", left.Type())
+		return newError("Line %d: Index operator not supported: %s", line, left.Type())
 	}
 }
 
@@ -404,12 +404,12 @@ func evalArrayIndexExpr(array, index object.Object) object.Object {
 	return arrayObj.Elements[idx]
 }
 
-func evalHashIndexExpr(hash, index object.Object) object.Object {
+func evalHashIndexExpr(hash, index object.Object, line int) object.Object {
 	hashObj := hash.(*object.Hash)
 
 	key, ok := index.(object.Hashable)
 	if !ok {
-		return newError("Unusable as a hash key: %s", index.Type())
+		return newError("Line %d: Unusable as a hash key: %s", line, index.Type())
 	}
 
 	pair, ok := hashObj.Pairs[key.HashKey()]
@@ -431,7 +431,7 @@ func evalHashLiteral(node *ast.HashLiteral, env *object.Environment) object.Obje
 
 		hashKey, ok := key.(object.Hashable)
 		if !ok {
-			return newError("Unusable as a hash key: %s", key.Type())
+			return newError("Line %d: Unusable as a hash key: %s", node.Token.Line, key.Type())
 		}
 
 		value := Eval(valueNode, env)
@@ -460,7 +460,7 @@ func evalExprs(exprs []ast.Expression, env *object.Environment) []object.Object 
 	return result
 }
 
-func applyFunction(function object.Object, args []object.Object) object.Object {
+func applyFunction(function object.Object, args []object.Object, line int) object.Object {
 	switch fn := function.(type) {
 	case *object.Function:
 		extendedEnv := extendFunctionEnv(fn, args)
@@ -472,7 +472,7 @@ func applyFunction(function object.Object, args []object.Object) object.Object {
 		}
 		return Null
 	default:
-		return newError("Not a function: %s", function.Type())
+		return newError("Line %d: Not a function: %s", line, function.Type())
 	}
 }
 

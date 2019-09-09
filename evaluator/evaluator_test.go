@@ -221,27 +221,27 @@ func TestErrorHandling(t *testing.T) {
 	}{
 		{
 			"5 + true;",
-			"Type mismatch: INTEGER + BOOLEAN",
+			"Line 0: Type mismatch: INTEGER + BOOLEAN",
 		},
 		{
 			"5 + true; 5;",
-			"Type mismatch: INTEGER + BOOLEAN",
+			"Line 0: Type mismatch: INTEGER + BOOLEAN",
 		},
 		{
 			"-true",
-			"Unknown operator: -BOOLEAN",
+			"Line 0: Unknown operator: -BOOLEAN",
 		},
 		{
 			"true + false;",
-			"Unknown operator: BOOLEAN + BOOLEAN",
+			"Line 0: Unknown operator: BOOLEAN + BOOLEAN",
 		},
 		{
 			"5; true + false; 5",
-			"Unknown operator: BOOLEAN + BOOLEAN",
+			"Line 0: Unknown operator: BOOLEAN + BOOLEAN",
 		},
 		{
 			"if (10 > 1) { true + false; }",
-			"Unknown operator: BOOLEAN + BOOLEAN",
+			"Line 0: Unknown operator: BOOLEAN + BOOLEAN",
 		},
 		{
 			`
@@ -253,19 +253,19 @@ if (10 > 1) {
   return 1;
 }
 `,
-			"Unknown operator: BOOLEAN + BOOLEAN",
+			"Line 3: Unknown operator: BOOLEAN + BOOLEAN",
 		},
 		{
 			"foobar",
-			"Identifier not found: foobar",
+			"Line 0: Identifier not found: foobar",
 		},
 		{
 			`"Hello" - "World"`,
-			"Unknown operator: STRING - STRING",
+			"Line 0: Unknown operator: STRING - STRING",
 		},
 		{
 			`{"name": "Monkey"}[func(x) { x }];`,
-			"Unusable as a hash key: FUNCTION",
+			"Line 0: Unusable as a hash key: FUNCTION",
 		},
 	}
 

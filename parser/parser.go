@@ -171,7 +171,9 @@ func (p *Parser) Errors() []string {
 }
 
 func (p *Parser) peekError(t token.TokenType) {
-	msg := fmt.Sprintf("Expected next token to be %s, got: %s instead", t, p.peekToken.Type)
+	msg := fmt.Sprintf(
+		"Line: %d: Expected next token to be %s, got: %s instead", p.currentToken.Line, t, p.peekToken.Type,
+	)
 	p.errors = append(p.errors, msg)
 }
 
@@ -322,7 +324,7 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 
 	value, err := strconv.ParseInt(p.currentToken.Literal, 0, 64)
 	if err != nil {
-		msg := fmt.Sprintf("Could not parse %q as integer", p.currentToken.Literal)
+		msg := fmt.Sprintf("Line %d: Could not parse %q as integer", p.currentToken.Line, p.currentToken.Literal)
 		p.errors = append(p.errors, msg)
 		return nil
 	}
@@ -612,6 +614,6 @@ func (p *Parser) registerPostfix(tokenType token.TokenType, fn postfixParseFunc)
 }
 
 func (p *Parser) noPrefixParseFuncError(t token.TokenType) {
-	msg := fmt.Sprintf("No prefix parse function for %s found", t)
+	msg := fmt.Sprintf("Line %d: No prefix parse function for %s found", p.currentToken.Line, t)
 	p.errors = append(p.errors, msg)
 }
