@@ -7,10 +7,10 @@ import (
 // Lexer performs our lexical analysis/scanning
 type Lexer struct {
 	input        []rune
+	char         rune // current char under examination
 	position     int  // current position in input (points to current char)
 	readPosition int  // current reading position in input (after current char)
-	char         rune // current char under examination
-	line         int
+	line         int  // line number for better error reporting, etc
 }
 
 // New creates and returns a pointer to the Lexer
@@ -44,10 +44,11 @@ func (l *Lexer) readString() string {
 	return string(l.input[position:l.position])
 }
 
-func newToken(tokenType token.TokenType, char ...rune) token.Token {
+func newToken(tokenType token.TokenType, line int, char ...rune) token.Token {
 	return token.Token{
 		Type:    tokenType,
 		Literal: string(char),
+		Line:    line,
 	}
 }
 
@@ -134,9 +135,13 @@ func (l *Lexer) NextToken() token.Token {
 			ch := l.char
 			l.readChar()
 			literal := string(ch) + string(l.char)
-			t = token.Token{Type: token.EqualEqual, Literal: literal}
+			t = token.Token{
+				Type:    token.EqualEqual,
+				Literal: literal,
+				Line:    l.line,
+			}
 		} else {
-			t = newToken(token.Equal, l.char)
+			t = newToken(token.Equal, l.line, l.char)
 		}
 	case '+':
 		if l.peek() == '+' {
@@ -145,9 +150,10 @@ func (l *Lexer) NextToken() token.Token {
 			t = token.Token{
 				Type:    token.PlusPlus,
 				Literal: string(ch) + string(l.char),
+				Line:    l.line,
 			}
 		} else {
-			t = newToken(token.Plus, l.char)
+			t = newToken(token.Plus, l.line, l.char)
 		}
 	case '-':
 		if l.peek() == '-' {
@@ -156,21 +162,26 @@ func (l *Lexer) NextToken() token.Token {
 			t = token.Token{
 				Type:    token.MinusMinus,
 				Literal: string(ch) + string(l.char),
+				Line:    l.line,
 			}
 		} else {
-			t = newToken(token.Minus, l.char)
+			t = newToken(token.Minus, l.line, l.char)
 		}
 	case '!':
 		if l.peek() == '=' {
 			ch := l.char
 			l.readChar()
 			literal := string(ch) + string(l.char)
-			t = token.Token{Type: token.BangEqual, Literal: literal}
+			t = token.Token{
+				Type:    token.BangEqual,
+				Literal: literal,
+				Line:    l.line,
+			}
 		} else {
-			t = newToken(token.Bang, l.char)
+			t = newToken(token.Bang, l.line, l.char)
 		}
 	case '*':
-		t = newToken(token.Star, l.char)
+		t = newToken(token.Star, l.line, l.char)
 	case '/':
 		if l.peek() == '/' {
 			l.skipSingleLineComment()
@@ -180,72 +191,76 @@ func (l *Lexer) NextToken() token.Token {
 			l.skipMultiLineComment()
 			return l.NextToken()
 		}
-		t = newToken(token.Slash, l.char)
+		t = newToken(token.Slash, l.line, l.char)
 	case '%':
-		t = newToken(token.Mod, l.char)
+		t = newToken(token.Mod, l.line, l.char)
 	case '<':
 		if l.peek() == '=' {
 			ch := l.char
 			l.readChar()
-			t = newToken(token.LessEqual, ch, l.char)
+			t = newToken(token.LessEqual, l.line, ch, l.char)
 		} else {
-			t = newToken(token.Less, l.char)
+			t = newToken(token.Less, l.line, l.char)
 		}
 	case '>':
 		if l.peek() == '=' {
 			ch := l.char
 			l.readChar()
-			t = newToken(token.GreaterEqual, ch, l.char)
+			t = newToken(token.GreaterEqual, l.line, ch, l.char)
 		} else {
-			t = newToken(token.Greater, l.char)
+			t = newToken(token.Greater, l.line, l.char)
 		}
 	case '&':
 		if l.peek() == '&' {
 			ch := l.char
 			l.readChar()
-			t = newToken(token.And, ch, l.char)
+			t = newToken(token.And, l.line, ch, l.char)
 		}
 	case '|':
 		if l.peek() == '|' {
 			ch := l.char
 			l.readChar()
-			t = newToken(token.Or, ch, l.char)
+			t = newToken(token.Or, l.line, ch, l.char)
 		}
 	case ',':
-		t = newToken(token.Comma, l.char)
+		t = newToken(token.Comma, l.line, l.char)
 	case ':':
-		t = newToken(token.Colon, l.char)
+		t = newToken(token.Colon, l.line, l.char)
 	case ';':
-		t = newToken(token.Semicolon, l.char)
+		t = newToken(token.Semicolon, l.line, l.char)
 	case '(':
-		t = newToken(token.LeftParen, l.char)
+		t = newToken(token.LeftParen, l.line, l.char)
 	case ')':
-		t = newToken(token.RightParen, l.char)
+		t = newToken(token.RightParen, l.line, l.char)
 	case '{':
-		t = newToken(token.LeftBrace, l.char)
+		t = newToken(token.LeftBrace, l.line, l.char)
 	case '}':
-		t = newToken(token.RightBrace, l.char)
+		t = newToken(token.RightBrace, l.line, l.char)
 	case '[':
-		t = newToken(token.LeftBracket, l.char)
+		t = newToken(token.LeftBracket, l.line, l.char)
 	case ']':
-		t = newToken(token.RightBracket, l.char)
+		t = newToken(token.RightBracket, l.line, l.char)
 	case '"':
 		t.Type = token.String
 		t.Literal = l.readString()
+		t.Line = l.line
 	case 0:
 		t.Literal = ""
 		t.Type = token.EOF
+		t.Line = l.line
 	default:
 		if isLetter(l.char) {
 			t.Literal = l.readIdentifier()
 			t.Type = token.LookupIdentifier(t.Literal)
+			t.Line = l.line
 			return t
 		} else if isInteger(l.char) {
 			t.Literal = l.readInteger()
 			t.Type = token.Integer
+			t.Line = l.line
 			return t
 		} else {
-			t = newToken(token.Illegal, l.char)
+			t = newToken(token.Illegal, l.line, l.char)
 		}
 	}
 
