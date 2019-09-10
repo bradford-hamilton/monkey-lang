@@ -21,6 +21,7 @@ I will formally document the language and it's features at some point, but for n
 9. Comparison operators `>=` and `<=`
 10. String comparisons using `!=` and `==`
 11. Line numbers throughout the tokens/lexer/parsing/evaluator used for better errors.
+12. Additional builtin functions: `pop`
 
 ## Installation
 Install Monkey using `go get`:

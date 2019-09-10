@@ -489,6 +489,13 @@ func TestBuiltinFunctions(t *testing.T) {
 				Message: "Argument to `push` must be an Array. Got: INTEGER",
 			},
 		},
+		{`pop([1, 2, 3])`, 3},
+		{`pop([1, 2, "three"])`, "three"},
+		{`pop([])`, &Null},
+		{`pop([1, 2, 3], "anything else")`,
+			&object.Error{
+				Message: "Wrong number of arguments. Got: 2, Expected: 1",
+			}},
 	}
 
 	runVMTests(t, tests)

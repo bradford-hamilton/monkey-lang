@@ -69,3 +69,7 @@ const two = "two"
 print("monkey" == "monkey")
 print("monkey" != "lang")
 print(one != two)
+
+print("print popped elements");
+print(pop([1, 2, 3]));
+print(pop(["one", "two", "three"]));

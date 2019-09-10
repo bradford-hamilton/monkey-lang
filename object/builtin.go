@@ -155,4 +155,26 @@ var Builtins = []struct {
 			},
 		},
 	},
+	{
+		"pop",
+		&Builtin{
+			Fn: func(args ...Object) Object {
+				if len(args) != 1 {
+					return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
+				}
+				if args[0].Type() != ArrayObj {
+					return newError("Argument to `pop` must be an Array. Got: %s", args[0].Type())
+				}
+
+				array := args[0].(*Array)
+
+				length := len(array.Elements)
+				if length == 0 {
+					return nil
+				}
+
+				return array.Elements[length-1]
+			},
+		},
+	},
 }

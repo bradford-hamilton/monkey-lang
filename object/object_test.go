@@ -411,3 +411,27 @@ func TestPush(t *testing.T) {
 		t.Errorf("push builtin returned wrong result. Expected: [99, 7, 356, 666]. Got: %s", pushBuiltin.Fn(arr, newEl).Inspect())
 	}
 }
+
+func TestPop(t *testing.T) {
+	arr := &Array{Elements: []Object{
+		&Integer{Value: 99},
+		&Integer{Value: 7},
+		&Integer{Value: 356},
+	}}
+	emptyArr := &Array{Elements: []Object{}}
+	str := &String{Value: "neat string"}
+
+	popBuiltin := GetBuiltinByName("pop")
+	if popBuiltin.Fn(arr, str).Inspect() != "Error: Wrong number of arguments. Got: 2, Expected: 1" {
+		t.Errorf("pop builtin returned wrong result. Expected: Error: Wrong number of arguments. Got: 2, Expected: 1. Got: %s", popBuiltin.Fn(arr, str).Inspect())
+	}
+	if popBuiltin.Fn(str).Inspect() != "Error: Argument to `pop` must be an Array. Got: STRING" {
+		t.Errorf("pop builtin returned wrong result. Expected: Error: Argument to `pop` must be an Array. Got: STRING. Got: %s", popBuiltin.Fn(str).Inspect())
+	}
+	if popBuiltin.Fn(arr).Inspect() != "356" {
+		t.Errorf("pop builtin returned wrong result. Expected: 356. Got: %s", popBuiltin.Fn(arr).Inspect())
+	}
+	if popBuiltin.Fn(emptyArr) != nil {
+		t.Errorf("pop builtin returned wrong result. Expected: null. Got: %s", popBuiltin.Fn(emptyArr))
+	}
+}
