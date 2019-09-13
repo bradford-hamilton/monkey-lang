@@ -428,8 +428,8 @@ func TestPop(t *testing.T) {
 	if popBuiltin.Fn(str).Inspect() != "Error: Argument to `pop` must be an Array. Got: STRING" {
 		t.Errorf("pop builtin returned wrong result. Expected: Error: Argument to `pop` must be an Array. Got: STRING. Got: %s", popBuiltin.Fn(str).Inspect())
 	}
-	if popBuiltin.Fn(arr).Inspect() != "356" {
-		t.Errorf("pop builtin returned wrong result. Expected: 356. Got: %s", popBuiltin.Fn(arr).Inspect())
+	if popBuiltin.Fn(arr).Inspect() != "[99, 7]" {
+		t.Errorf("pop builtin returned wrong result. Expected: [99, 7]. Got: %s", popBuiltin.Fn(arr).Inspect())
 	}
 	if popBuiltin.Fn(emptyArr) != nil {
 		t.Errorf("pop builtin returned wrong result. Expected: null. Got: %s", popBuiltin.Fn(emptyArr))

@@ -412,7 +412,7 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`rest([])`, nil},
 		{`push([], 1)`, []int{1}},
 		{`push(1, 1)`, "Argument to `push` must be an Array. Got: INTEGER"},
-		{`pop([7, 8, 9])`, 9},
+		{`pop([7, 8, 9])`, []int{7, 8}},
 		{`pop(["monkey", "lang"])`, object.String{Value: "lang"}},
 		{`pop([])`, Null},
 		{`pop(1)`, "Argument to `pop` must be an Array. Got: INTEGER"},

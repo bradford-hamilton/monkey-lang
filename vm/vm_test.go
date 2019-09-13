@@ -489,8 +489,8 @@ func TestBuiltinFunctions(t *testing.T) {
 				Message: "Argument to `push` must be an Array. Got: INTEGER",
 			},
 		},
-		{`pop([1, 2, 3])`, 3},
-		{`pop([1, 2, "three"])`, "three"},
+		{`pop([1, 2, 3])`, []int{1, 2}},
+		{`pop(["one", "two", "three"])`, []string{"one", "two"}},
 		{`pop([])`, &Null},
 		{`pop([1, 2, 3], "anything else")`,
 			&object.Error{
