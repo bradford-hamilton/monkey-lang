@@ -22,6 +22,7 @@ I will formally document the language and it's features at some point, but for n
 10. String comparisons using `!=` and `==`
 11. Line numbers throughout the tokens/lexer/parsing/evaluator used for better errors.
 12. Additional builtin functions: `pop`
+13. [VS Code syntax highlighting extension](https://github.com/bradford-hamilton/vscode-monkeylang-syntax). Not yet published, but working and provides basic syntax highlighting.
 
 ## Installation
 Install Monkey using `go get`:
