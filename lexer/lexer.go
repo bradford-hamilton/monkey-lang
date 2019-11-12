@@ -134,10 +134,9 @@ func (l *Lexer) NextToken() token.Token {
 		if l.peek() == '=' {
 			ch := l.char
 			l.readChar()
-			literal := string(ch) + string(l.char)
 			t = token.Token{
 				Type:    token.EqualEqual,
-				Literal: literal,
+				Literal: string(ch) + string(l.char),
 				Line:    l.line,
 			}
 		} else {
@@ -171,10 +170,9 @@ func (l *Lexer) NextToken() token.Token {
 		if l.peek() == '=' {
 			ch := l.char
 			l.readChar()
-			literal := string(ch) + string(l.char)
 			t = token.Token{
 				Type:    token.BangEqual,
-				Literal: literal,
+				Literal: string(ch) + string(l.char),
 				Line:    l.line,
 			}
 		} else {
