@@ -25,11 +25,23 @@ I will formally document the language and it's features at some point, but for n
 13. [VS Code syntax highlighting extension](https://github.com/bradford-hamilton/vscode-monkeylang-syntax). Not yet published, but working and provides basic syntax highlighting.
 
 ## Installation
-Install Monkey using `go get`:
+_**Option A:**_
+
+If you mosey on over to [releases](https://github.com/bradford-hamilton/monkey-lang/releases/tag/v0.2.0), you'll find binaries for darwin, linux, windows, and amd64. You can download directly from there.
+
+_**Option B:**_
+
+If you have Go installed on your machine, use `go install`:
 
 ```
-go get -u github.com/bradford-hamilton/monkey-lang
+go install github.com/bradford-hamilton/monkey-lang
 ```
+
+This will place the binary in your `go/bin` and is ready to use.
+
+_**Option C:**_
+
+Brew coming soon.
 
 ## Usage
 Build
