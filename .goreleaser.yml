@@ -20,3 +20,18 @@ changelog:
     - '^test:'
     - '(?i)\breadme\b'
     - '(?i)\bsmall\b'
+brews:
+  -
+    name: monkey
+    github:
+      owner: bradford-hamilton
+      name: homebrew-monkey
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@carlosbecker.com
+    description: "https://github.com/bradford-hamilton/monkey-lang."
+    dependencies:
+      - git
+      - zsh
+    install: |
+      bin.install "monkey"
