@@ -62,12 +62,12 @@ Run
 
 Running with vm
 ```
-./monkey --engine=vm examples/program.mn
+./monkey --engine=vm examples/program.mo
 ```
 
 Running with evaluator
 ```
-./monkey --engine=eval examples/program.mn
+./monkey --engine=eval examples/program.mo
 ```
 
 Run interactive console
