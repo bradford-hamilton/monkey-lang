@@ -79,3 +79,9 @@ let newArray = pop(original);
 
 print(original);
 print(newArray);
+
+let has_attribute? = true;
+
+if (has_attribute?) {
+  print("It has the attribute!");
+}

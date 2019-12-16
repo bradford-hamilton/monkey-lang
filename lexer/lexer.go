@@ -52,8 +52,9 @@ func newToken(tokenType token.TokenType, line int, char ...rune) token.Token {
 	}
 }
 
+// Allow a-z, A-Z, _, ?
 func isLetter(char rune) bool {
-	return 'a' <= char && char <= 'z' || 'A' <= char && char <= 'Z' || char == '_'
+	return 'a' <= char && char <= 'z' || 'A' <= char && char <= 'Z' || char == '_' || char == '?'
 }
 
 func isInteger(char rune) bool {

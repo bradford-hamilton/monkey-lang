@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/bradford-hamilton/monkey-lang/token"
@@ -57,6 +58,8 @@ five--
 /*
 	multiline comment
 */
+
+let snake_case_with_question_mark? = true;
 `
 
 	tests := []struct {
@@ -181,14 +184,19 @@ five--
 		{token.LessEqual, "<=", 45},
 		{token.Integer, "5", 45},
 		{token.Semicolon, ";", 45},
-		{token.EOF, "", 48},
+		{token.Let, "let", 49},
+		{token.Identifier, "snake_case_with_question_mark?", 49},
+		{token.Equal, "=", 49},
+		{token.True, "true", 49},
+		{token.Semicolon, ";", 49},
+		{token.EOF, "", 50},
 	}
 
 	l := New(input)
 
 	for i, tt := range tests {
 		token := l.NextToken()
-
+		fmt.Printf("Line: %d: Expected: %d", token.Line, tt.expectedLine)
 		if token.Type != tt.expectedType {
 			t.Fatalf("tests[%d] - tokentype wrong. Expected: %q, Got: %q", i, tt.expectedType, token.Type)
 		}
