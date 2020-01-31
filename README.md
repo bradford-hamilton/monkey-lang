@@ -6,7 +6,7 @@
 
 # Monkey Lang
 
-Currently extending the Monkey programming language designed in [_Writing An Interpreter In Go_](https://interpreterbook.com/) and [_Writing a Compiler in Go_](https://compilerbook.com).
+Currently extending the Monkey programming language designed in [_Writing An Interpreter In Go_](https://interpreterbook.com) and [_Writing a Compiler in Go_](https://compilerbook.com).
 
 I will formally document the language and it's features at some point, but for now I'm keeping a list of the additional functionality I've added on top of original design:
 
@@ -24,6 +24,7 @@ I will formally document the language and it's features at some point, but for n
 12. Ability to have question marks in identifiers. Ex: `has_attribute?`
 13. Additional builtin functions: `pop`
 14. [VS Code syntax highlighting extension](https://github.com/bradford-hamilton/vscode-monkeylang-syntax). Not yet published, but working and provides basic syntax highlighting.
+15. Add installation support through [brew](https://brew.sh)
 
 ## Installation
 _**Option A:**_
@@ -35,7 +36,7 @@ brew install bradford-hamilton/monkey/monkey
 
 _**Option B:**_
 
-If you mosey on over to [releases](https://github.com/bradford-hamilton/monkey-lang/releases/tag/v0.2.0), you'll find binaries for darwin, linux, windows, and amd64. You can download directly from there.
+If you mosey on over to [releases](https://github.com/bradford-hamilton/monkey-lang/releases), you'll find binaries for darwin, linux, windows, and amd64. You can download directly from there.
 
 _**Option C:**_
 
