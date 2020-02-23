@@ -27,7 +27,7 @@ All additional features have been implemented for both the interpreter and the c
 13. Additional builtin functions: `pop`
 14. [VS Code syntax highlighting extension](https://github.com/bradford-hamilton/vscode-monkeylang-syntax). Not yet published, but working and provides basic syntax highlighting.
 15. Add installation support through [brew](https://brew.sh)
-16. Add travis CI for builds/tests & add roughly +20% code coverage
+16. Add roughly +20% code coverage
 
 ## Installation
 _**Option A:**_
