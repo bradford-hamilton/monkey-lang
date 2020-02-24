@@ -10,7 +10,7 @@ Currently extending the Monkey programming language designed in [_Writing An Int
 
 I will formally document the language and it's features at some point, but for now I'm keeping a list of the additional functionality I've added on top of original design.
 
-All additional features have been implemented for both the interpreter and the compiler:
+All additional features (where applicable) have been implemented for both the interpreter and the compiler:
 
 1. Ability to execute Monkey files (.mo file ext) in addition to the interactive console. This is now the default behavior. Add `--console` flag when executing to drop into the REPL instead.
 2. Both file execution and console usage respond to an `--engine=` flag where you can choose to use the evaluator or the VM.
