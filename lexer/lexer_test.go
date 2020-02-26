@@ -63,7 +63,7 @@ let snake_case_with_question_mark? = true;
 `
 
 	tests := []struct {
-		expectedType    token.TokenType
+		expectedType    token.Type
 		expectedLiteral string
 		expectedLine    int
 	}{

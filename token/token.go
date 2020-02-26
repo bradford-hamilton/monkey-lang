@@ -51,17 +51,17 @@ const (
 	Return   = "RETURN"
 )
 
-// TokenType is a type alias for a string
-type TokenType string
+// Type is a type alias for a string
+type Type string
 
 // Token is a struct representing a Monkey token - holds a Type and a Literal
 type Token struct {
-	Type    TokenType
+	Type    Type
 	Literal string
 	Line    int
 }
 
-var keywords = map[string]TokenType{
+var keywords = map[string]Type{
 	"func":   Function,
 	"let":    Let,
 	"const":  Const,
@@ -73,8 +73,8 @@ var keywords = map[string]TokenType{
 }
 
 // LookupIdentifier checks our keywords map for the scanned keyword. If it finds one, then
-// the keywords TokenType is returned. If not, the user defined IDENTIFIER is returned
-func LookupIdentifier(identifier string) TokenType {
+// the keywords Type is returned. If not, the user defined IDENTIFIER is returned
+func LookupIdentifier(identifier string) Type {
 	if token, ok := keywords[identifier]; ok {
 		return token
 	}

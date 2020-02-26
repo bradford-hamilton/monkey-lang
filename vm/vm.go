@@ -448,9 +448,9 @@ func nativeBoolToBooleanObj(input bool) *object.Boolean {
 
 // Coerce our different object types to booleans for truthy/falsey values
 func coerceObjToNativeBool(o object.Object) bool {
-	// if rv, ok := o.(*object.ReturnValue); ok {
-	// 	o = rv.Value
-	// }
+	if rv, ok := o.(*object.ReturnValue); ok {
+		o = rv.Value
+	}
 
 	switch obj := o.(type) {
 	case *object.Boolean:

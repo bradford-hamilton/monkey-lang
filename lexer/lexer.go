@@ -44,7 +44,7 @@ func (l *Lexer) readString() string {
 	return string(l.input[position:l.position])
 }
 
-func newToken(tokenType token.TokenType, line int, char ...rune) token.Token {
+func newToken(tokenType token.Type, line int, char ...rune) token.Token {
 	return token.Token{
 		Type:    tokenType,
 		Literal: string(char),
