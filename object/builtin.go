@@ -40,143 +40,122 @@ var Builtins = []struct {
 	Name    string
 	Builtin *Builtin
 }{
-	{
-		"len",
-		&Builtin{
-			Fn: func(args ...Object) Object {
-				if len(args) != 1 {
-					return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
-				}
-				switch arg := args[0].(type) {
-				case *Array:
-					return &Integer{Value: int64(len(arg.Elements))}
-				case *String:
-					return &Integer{Value: int64(len(arg.Value))}
-				default:
-					return newError("Argument to `len` not supported. Got: %s", args[0].Type())
-				}
-			},
-		},
-	},
-	{
-		"print",
-		&Builtin{
-			Fn: func(args ...Object) Object {
-				for _, arg := range args {
-					fmt.Println(arg.Inspect())
-				}
-				return nil
-			},
-		},
-	},
-	{
-		"first",
-		&Builtin{
-			Fn: func(args ...Object) Object {
-				if len(args) != 1 {
-					return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
-				}
-				if args[0].Type() != ArrayObj {
-					return newError("Argument to `first` must be an Array. Got: %s", args[0].Type())
-				}
+	{"len", &Builtin{Fn: mLen}},
+	{"print", &Builtin{Fn: mPrint}},
+	{"first", &Builtin{Fn: mFirst}},
+	{"last", &Builtin{Fn: mLast}},
+	{"rest", &Builtin{Fn: mRest}},
+	{"push", &Builtin{Fn: mPush}},
+	{"pop", &Builtin{Fn: mPop}},
+}
 
-				array := args[0].(*Array)
-				if len(array.Elements) > 0 {
-					return array.Elements[0]
-				}
+func mLen(args ...Object) Object {
+	if len(args) != 1 {
+		return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
+	}
+	switch arg := args[0].(type) {
+	case *Array:
+		return &Integer{Value: int64(len(arg.Elements))}
+	case *String:
+		return &Integer{Value: int64(len(arg.Value))}
+	default:
+		return newError("Argument to `len` not supported. Got: %s", args[0].Type())
+	}
+}
 
-				return nil
-			},
-		},
-	},
-	{
-		"last",
-		&Builtin{
-			Fn: func(args ...Object) Object {
-				if len(args) != 1 {
-					return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
-				}
-				if args[0].Type() != ArrayObj {
-					return newError("Argument to `last` must be an Array. Got: %s", args[0].Type())
-				}
+func mPrint(args ...Object) Object {
+	for _, arg := range args {
+		fmt.Println(arg.Inspect())
+	}
+	return nil
+}
 
-				array := args[0].(*Array)
-				length := len(array.Elements)
-				if length > 0 {
-					return array.Elements[length-1]
-				}
+func mFirst(args ...Object) Object {
+	if len(args) != 1 {
+		return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
+	}
+	if args[0].Type() != ArrayObj {
+		return newError("Argument to `first` must be an Array. Got: %s", args[0].Type())
+	}
 
-				return nil
-			},
-		},
-	},
-	{
-		"rest",
-		&Builtin{
-			Fn: func(args ...Object) Object {
-				if len(args) != 1 {
-					return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
-				}
-				if args[0].Type() != ArrayObj {
-					return newError("Argument to `rest` must be an Array. Got: %s", args[0].Type())
-				}
+	array := args[0].(*Array)
+	if len(array.Elements) > 0 {
+		return array.Elements[0]
+	}
 
-				array := args[0].(*Array)
-				length := len(array.Elements)
-				if length > 0 {
-					newElements := make([]Object, length-1, length-1)
-					copy(newElements, array.Elements[1:length])
-					return &Array{Elements: newElements}
-				}
+	return nil
+}
 
-				return nil
-			},
-		},
-	},
-	{
-		"push",
-		&Builtin{
-			Fn: func(args ...Object) Object {
-				if len(args) != 2 {
-					return newError("Wrong number of arguments. Got: %d, Expected: 2", len(args))
-				}
-				if args[0].Type() != ArrayObj {
-					return newError("Argument to `push` must be an Array. Got: %s", args[0].Type())
-				}
+func mLast(args ...Object) Object {
+	if len(args) != 1 {
+		return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
+	}
+	if args[0].Type() != ArrayObj {
+		return newError("Argument to `last` must be an Array. Got: %s", args[0].Type())
+	}
 
-				array := args[0].(*Array)
-				length := len(array.Elements)
+	array := args[0].(*Array)
+	length := len(array.Elements)
+	if length > 0 {
+		return array.Elements[length-1]
+	}
 
-				newElements := make([]Object, length+1, length+1)
-				copy(newElements, array.Elements)
-				newElements[length] = args[1]
+	return nil
+}
 
-				return &Array{Elements: newElements}
-			},
-		},
-	},
-	{
-		"pop",
-		&Builtin{
-			Fn: func(args ...Object) Object {
-				if len(args) != 1 {
-					return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
-				}
-				if args[0].Type() != ArrayObj {
-					return newError("Argument to `pop` must be an Array. Got: %s", args[0].Type())
-				}
+func mRest(args ...Object) Object {
+	if len(args) != 1 {
+		return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
+	}
+	if args[0].Type() != ArrayObj {
+		return newError("Argument to `rest` must be an Array. Got: %s", args[0].Type())
+	}
 
-				array := args[0].(*Array)
-				length := len(array.Elements)
-				if length == 0 {
-					return nil
-				}
+	array := args[0].(*Array)
+	length := len(array.Elements)
+	if length > 0 {
+		newElements := make([]Object, length-1, length-1)
+		copy(newElements, array.Elements[1:length])
+		return &Array{Elements: newElements}
+	}
 
-				newElements := make([]Object, length-1, length-1)
-				copy(newElements, array.Elements[0:length-1])
+	return nil
+}
 
-				return &Array{Elements: newElements}
-			},
-		},
-	},
+func mPush(args ...Object) Object {
+	if len(args) != 2 {
+		return newError("Wrong number of arguments. Got: %d, Expected: 2", len(args))
+	}
+	if args[0].Type() != ArrayObj {
+		return newError("Argument to `push` must be an Array. Got: %s", args[0].Type())
+	}
+
+	array := args[0].(*Array)
+	length := len(array.Elements)
+
+	newElements := make([]Object, length+1, length+1)
+	copy(newElements, array.Elements)
+	newElements[length] = args[1]
+
+	return &Array{Elements: newElements}
+}
+
+func mPop(args ...Object) Object {
+	if len(args) != 1 {
+		return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
+	}
+	if args[0].Type() != ArrayObj {
+		return newError("Argument to `pop` must be an Array. Got: %s", args[0].Type())
+	}
+
+	array := args[0].(*Array)
+	length := len(array.Elements)
+	if length == 0 {
+		return nil
+	}
+
+	newElements := make([]Object, length-1, length-1)
+	copy(newElements, array.Elements[0:length-1])
+
+	return &Array{Elements: newElements}
 }
