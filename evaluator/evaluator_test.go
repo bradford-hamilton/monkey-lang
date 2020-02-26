@@ -417,6 +417,12 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`pop([])`, Null},
 		{`pop(1)`, "Argument to `pop` must be an Array. Got: INTEGER"},
 		{`pop([1, 2], [1, 2])`, "Wrong number of arguments. Got: 2, Expected: 1"},
+		{`split("My name is brad")`, "Wrong number of arguments. Got: 1, Expected: 2"},
+		{`split("My name is brad", " ")`, []string{"My", "name", "is", "brad"}},
+		{`split("", " ")`, []string{}},
+		{`join([])`, "Wrong number of arguments. Got: 1, Expected: 2"},
+		{`join([], "")`, object.String{Value: ""}},
+		{`join(["My", "name", "is", "brad"], " ")`, object.String{Value: "My name is brad"}},
 	}
 
 	for _, tt := range tests {

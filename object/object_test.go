@@ -435,3 +435,54 @@ func TestPop(t *testing.T) {
 		t.Errorf("pop builtin returned wrong result. Expected: null. Got: %s", popBuiltin.Fn(emptyArr))
 	}
 }
+
+func TestSplit(t *testing.T) {
+	str := &String{Value: "My name is brad"}
+	splitOn := &String{Value: " "}
+	array := &Array{Elements: []Object{}}
+
+	splitBuiltin := GetBuiltinByName("split")
+	if splitBuiltin.Fn(str).Inspect() != "Error: Wrong number of arguments. Got: 1, Expected: 2" {
+		t.Errorf("pop builtin returned wrong result. Expected: Error: Wrong number of arguments. Got: 1, Expected: 2. Got: %s", splitBuiltin.Fn(str).Inspect())
+	}
+	if splitBuiltin.Fn(array, str).Inspect() != "Error: First argument to `split` must be a String. Got: ARRAY" {
+		t.Errorf("split builtin returned wrong result. Expected: Error: First argument to `split` must be a String. Got:. Got: %s", splitBuiltin.Fn(array, str).Inspect())
+	}
+	if splitBuiltin.Fn(str, splitOn).Inspect() != "[My, name, is, brad]" {
+		t.Errorf("split builtin returned wrong result. Expected: [My, name, is, brad]. Got: %s", splitBuiltin.Fn(str, splitOn).Inspect())
+	}
+}
+
+func TestJoin(t *testing.T) {
+	array := &Array{
+		Elements: []Object{
+			&String{Value: "My"},
+			&String{Value: "name"},
+			&String{Value: "is"},
+			&String{Value: "brad"},
+		},
+	}
+	mixedArray := &Array{
+		Elements: []Object{
+			&String{Value: "My"},
+			&String{Value: "name"},
+			&Boolean{Value: true},
+		},
+	}
+	joinOn := &String{Value: " "}
+	notAnArray := &String{Value: "not an array"}
+
+	joinBuiltin := GetBuiltinByName("join")
+	if joinBuiltin.Fn(array).Inspect() != "Error: Wrong number of arguments. Got: 1, Expected: 2" {
+		t.Errorf("join builtin returned wrong result. Expected: Error: Wrong number of arguments. Got: 1, Expected: 2. Got: %s", joinBuiltin.Fn(array).Inspect())
+	}
+	if joinBuiltin.Fn(notAnArray, joinOn).Inspect() != "Error: First argument to `join` must be an Array. Got: STRING" {
+		t.Errorf("join builtin returned wrong result. Expected: Error: First argument to `join` must be an Array. Got:. Got: %s", joinBuiltin.Fn(notAnArray, joinOn).Inspect())
+	}
+	if joinBuiltin.Fn(mixedArray, joinOn).Inspect() != "Error: You can only join an array of all strings. Illegal type found: BOOLEAN" {
+		t.Errorf("join builtin returned wrong result. Expected: Error: You can only join an array of all strings. Illegal type found: BOOLEAN. Got: %s", joinBuiltin.Fn(mixedArray, joinOn).Inspect())
+	}
+	if joinBuiltin.Fn(array, joinOn).Inspect() != "My name is brad" {
+		t.Errorf("split builtin returned wrong result. Expected: My name is brad. Got: %s", joinBuiltin.Fn(array, joinOn).Inspect())
+	}
+}

@@ -85,3 +85,9 @@ let has_attribute? = true;
 if (has_attribute?) {
   print("It has the attribute!");
 }
+
+let name = "hey there my name is brad";
+let split_name = split(name, " ");
+print(split_name);
+let joined_name = join(split_name, " ");
+print(joined_name);

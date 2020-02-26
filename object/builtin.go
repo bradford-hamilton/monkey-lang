@@ -2,6 +2,7 @@ package object
 
 import (
 	"fmt"
+	"strings"
 )
 
 // BuiltinFunction is a type representing functions we write in Go and
@@ -47,6 +48,8 @@ var Builtins = []struct {
 	{"rest", &Builtin{Fn: mRest}},
 	{"push", &Builtin{Fn: mPush}},
 	{"pop", &Builtin{Fn: mPop}},
+	{"split", &Builtin{Fn: mSplit}},
+	{"join", &Builtin{Fn: mJoin}},
 }
 
 func mLen(args ...Object) Object {
@@ -158,4 +161,61 @@ func mPop(args ...Object) Object {
 	copy(newElements, array.Elements[0:length-1])
 
 	return &Array{Elements: newElements}
+}
+
+func mSplit(args ...Object) Object {
+	if len(args) != 2 {
+		return newError("Wrong number of arguments. Got: %d, Expected: 2", len(args))
+	}
+	if args[0].Type() != StringObj {
+		return newError("First argument to `split` must be a String. Got: %s", args[0].Type())
+	}
+	if args[1].Type() != StringObj {
+		return newError("Second argument to `split` must be a String. Got: %s", args[1].Type())
+	}
+
+	str := args[0].(*String)
+	splitOn := args[1].(*String)
+	array := strings.Split(str.Value, splitOn.Value)
+
+	monkeyArray := []Object{}
+	for _, v := range array {
+		monkeyArray = append(monkeyArray, &String{Value: v})
+	}
+
+	return &Array{Elements: monkeyArray}
+}
+
+func mJoin(args ...Object) Object {
+	if len(args) != 2 {
+		return newError("Wrong number of arguments. Got: %d, Expected: 2", len(args))
+	}
+	if args[0].Type() != ArrayObj {
+		return newError("First argument to `join` must be an Array. Got: %s", args[0].Type())
+	}
+	if args[1].Type() != StringObj {
+		return newError("Second argument to `join` must be a String. Got: %s", args[1].Type())
+	}
+
+	array := args[0].(*Array)
+	length := len(array.Elements)
+	if length == 0 {
+		return &String{Value: ""}
+	}
+	joinOn := args[1].(*String)
+	goString := joinOn.Value
+
+	var goSlice []string
+	for _, e := range array.Elements {
+		switch obj := e.(type) {
+		case *String:
+			goSlice = append(goSlice, obj.Value)
+		default:
+			return newError("You can only join an array of all strings. Illegal type found: %s", obj.Type())
+		}
+	}
+
+	goStrJoined := strings.Join(goSlice, goString)
+
+	return &String{Value: goStrJoined}
 }

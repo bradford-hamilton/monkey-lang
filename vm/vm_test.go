@@ -495,7 +495,22 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`pop([1, 2, 3], "anything else")`,
 			&object.Error{
 				Message: "Wrong number of arguments. Got: 2, Expected: 1",
-			}},
+			},
+		},
+		{`split("My name is brad")`,
+			&object.Error{
+				Message: "Wrong number of arguments. Got: 1, Expected: 2",
+			},
+		},
+		{`split("My name is brad", " ")`, []string{"My", "name", "is", "brad"}},
+		{`split("", " ")`, []string{}},
+		{`join(["My", "name", "is", "brad"])`,
+			&object.Error{
+				Message: "Wrong number of arguments. Got: 1, Expected: 2",
+			},
+		},
+		{`join("My name is brad", " ")`, []string{"My", "name", "is", "brad"}},
+		{`join("", " ")`, []string{}},
 	}
 
 	runVMTests(t, tests)

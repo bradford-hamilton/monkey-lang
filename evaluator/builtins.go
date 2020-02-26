@@ -12,4 +12,6 @@ var builtinFunctions = map[string]*object.Builtin{
 	"rest":  object.GetBuiltinByName("rest"),
 	"push":  object.GetBuiltinByName("push"),
 	"pop":   object.GetBuiltinByName("pop"),
+	"split": object.GetBuiltinByName("split"),
+	"join":  object.GetBuiltinByName("join"),
 }
