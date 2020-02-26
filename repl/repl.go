@@ -14,8 +14,8 @@ import (
 	"github.com/bradford-hamilton/monkey-lang/vm"
 )
 
-// MonkeyFace ...need I explain?
-const MonkeyFace = `            __,__
+// Oops ...need I explain?
+const Oops = `            __,__
 ooooooo                                      oo
 o888   888o   ooooooo  ooooooooo    oooooooo8 8888
 888     888 888     888 888    888 888ooooooo 8888
@@ -103,7 +103,7 @@ func compileAndExecute(
 }
 
 func printParserErrors(out io.Writer, errors []string) {
-	io.WriteString(out, MonkeyFace)
+	io.WriteString(out, Oops)
 	io.WriteString(out, "Oops! We ran into some monkey business here!\n")
 	io.WriteString(out, " parser errors:\n")
 	for _, msg := range errors {
