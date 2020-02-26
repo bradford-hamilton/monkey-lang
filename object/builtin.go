@@ -215,7 +215,7 @@ func mJoin(args ...Object) Object {
 		}
 	}
 
-	goStrJoined := strings.Join(goSlice, goString)
-
-	return &String{Value: goStrJoined}
+	return &String{
+		Value: strings.Join(goSlice, goString),
+	}
 }
