@@ -41,18 +41,18 @@ var Builtins = []struct {
 	Name    string
 	Builtin *Builtin
 }{
-	{"len", &Builtin{Fn: mLen}},
-	{"print", &Builtin{Fn: mPrint}},
-	{"first", &Builtin{Fn: mFirst}},
-	{"last", &Builtin{Fn: mLast}},
-	{"rest", &Builtin{Fn: mRest}},
-	{"push", &Builtin{Fn: mPush}},
-	{"pop", &Builtin{Fn: mPop}},
-	{"split", &Builtin{Fn: mSplit}},
-	{"join", &Builtin{Fn: mJoin}},
+	{"len", &Builtin{Fn: bLen}},
+	{"print", &Builtin{Fn: bPrint}},
+	{"first", &Builtin{Fn: bFirst}},
+	{"last", &Builtin{Fn: bLast}},
+	{"rest", &Builtin{Fn: bRest}},
+	{"push", &Builtin{Fn: bPush}},
+	{"pop", &Builtin{Fn: bPop}},
+	{"split", &Builtin{Fn: bSplit}},
+	{"join", &Builtin{Fn: bJoin}},
 }
 
-func mLen(args ...Object) Object {
+func bLen(args ...Object) Object {
 	if len(args) != 1 {
 		return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
 	}
@@ -66,14 +66,14 @@ func mLen(args ...Object) Object {
 	}
 }
 
-func mPrint(args ...Object) Object {
+func bPrint(args ...Object) Object {
 	for _, arg := range args {
 		fmt.Println(arg.Inspect())
 	}
 	return nil
 }
 
-func mFirst(args ...Object) Object {
+func bFirst(args ...Object) Object {
 	if len(args) != 1 {
 		return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
 	}
@@ -89,7 +89,7 @@ func mFirst(args ...Object) Object {
 	return nil
 }
 
-func mLast(args ...Object) Object {
+func bLast(args ...Object) Object {
 	if len(args) != 1 {
 		return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
 	}
@@ -106,7 +106,7 @@ func mLast(args ...Object) Object {
 	return nil
 }
 
-func mRest(args ...Object) Object {
+func bRest(args ...Object) Object {
 	if len(args) != 1 {
 		return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
 	}
@@ -125,7 +125,7 @@ func mRest(args ...Object) Object {
 	return nil
 }
 
-func mPush(args ...Object) Object {
+func bPush(args ...Object) Object {
 	if len(args) != 2 {
 		return newError("Wrong number of arguments. Got: %d, Expected: 2", len(args))
 	}
@@ -143,7 +143,7 @@ func mPush(args ...Object) Object {
 	return &Array{Elements: newElements}
 }
 
-func mPop(args ...Object) Object {
+func bPop(args ...Object) Object {
 	if len(args) != 1 {
 		return newError("Wrong number of arguments. Got: %d, Expected: 1", len(args))
 	}
@@ -163,7 +163,7 @@ func mPop(args ...Object) Object {
 	return &Array{Elements: newElements}
 }
 
-func mSplit(args ...Object) Object {
+func bSplit(args ...Object) Object {
 	if len(args) != 2 {
 		return newError("Wrong number of arguments. Got: %d, Expected: 2", len(args))
 	}
@@ -186,7 +186,7 @@ func mSplit(args ...Object) Object {
 	return &Array{Elements: monkeyArray}
 }
 
-func mJoin(args ...Object) Object {
+func bJoin(args ...Object) Object {
 	if len(args) != 2 {
 		return newError("Wrong number of arguments. Got: %d, Expected: 2", len(args))
 	}
