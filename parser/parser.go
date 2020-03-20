@@ -70,11 +70,14 @@ type Parser struct {
 // peek tokens, and returns the Parser.
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{
-		lexer:  l,
-		errors: []string{},
+		lexer:             l,
+		errors:            []string{},
+		prefixParseFuncs:  make(map[token.Type]prefixParseFunc),
+		infixParseFuncs:   make(map[token.Type]infixParseFunc),
+		postfixParseFuncs: make(map[token.Type]postfixParseFunc),
 	}
 
-	p.prefixParseFuncs = make(map[token.Type]prefixParseFunc)
+	// Register all of our prefix parse funcs
 	p.registerPrefix(token.Identifier, p.parseIdentifier)
 	p.registerPrefix(token.Integer, p.parseIntegerLiteral)
 	p.registerPrefix(token.Bang, p.parsePrefixExpression)
@@ -88,7 +91,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.LeftBracket, p.parseArrayLiteral)
 	p.registerPrefix(token.LeftBrace, p.parseHashLiteral)
 
-	p.infixParseFuncs = make(map[token.Type]infixParseFunc)
+	// Register all of our infix parse funcs
 	p.registerInfix(token.Plus, p.parseInfixExpression)
 	p.registerInfix(token.Minus, p.parseInfixExpression)
 	p.registerInfix(token.Slash, p.parseInfixExpression)
@@ -105,7 +108,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.And, p.parseInfixExpression)
 	p.registerInfix(token.Or, p.parseInfixExpression)
 
-	p.postfixParseFuncs = make(map[token.Type]postfixParseFunc)
+	// Register all of our postfix parse funcs
 	p.registerPostfix(token.PlusPlus, p.parsePostfixExpression)
 	p.registerPostfix(token.MinusMinus, p.parsePostfixExpression)
 
