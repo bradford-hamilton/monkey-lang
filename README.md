@@ -6,9 +6,11 @@
 
 # Monkey Lang
 
-Currently extending the Monkey programming language designed in [_Writing An Interpreter In Go_](https://interpreterbook.com) and [_Writing a Compiler in Go_](https://compilerbook.com).
+Currently extending the Monkey programming language designed in [_Writing An Interpreter In Go_](https://interpreterbook.com) and [_Writing a Compiler in Go_](https://compilerbook.com) by [Thorsten Ball](https://github.com/mrnugget). I **_highly_** recommend picking up a copy of his books.
 
-I will formally document the language and it's features at some point, but for now I'm keeping a list of the additional functionality I've added on top of original design.
+If there is any interest, I also started a version of monkey-lang [written in rust](https://github.com/bradford-hamilton/monkey_lang_rust).
+
+I'll formally document the language and it's features at some point, but for now I'm keeping a list of the additional functionality I've added on top of original design.
 
 All additional features (where applicable) have been implemented for both the interpreter and the compiler:
 
