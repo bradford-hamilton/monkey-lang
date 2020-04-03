@@ -473,8 +473,10 @@ func (p *Parser) parseArrayLiteral() ast.Expression {
 }
 
 func (p *Parser) parseHashLiteral() ast.Expression {
-	hash := &ast.HashLiteral{Token: p.currentToken}
-	hash.Pairs = make(map[ast.Expression]ast.Expression)
+	hash := &ast.HashLiteral{
+		Token: p.currentToken,
+		Pairs: make(map[ast.Expression]ast.Expression),
+	}
 
 	for !p.peekTokenTypeIs(token.RightBrace) {
 		p.nextToken()
