@@ -206,7 +206,7 @@ func (p *Parser) peekTokenPrecedence() int {
 	return Lowest
 }
 
-func (p *Parser) currenTokenPrecedence() int {
+func (p *Parser) currentTokenPrecedence() int {
 	if p, ok := precedences[p.currentToken.Type]; ok {
 		return p
 	}
@@ -592,7 +592,7 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 		Left:     left,
 	}
 
-	precedence := p.currenTokenPrecedence()
+	precedence := p.currentTokenPrecedence()
 	p.nextToken()
 	expr.Right = p.parseExpr(precedence)
 

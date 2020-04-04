@@ -85,3 +85,7 @@ Run interactive console
 ```
 ./monkey --console
 ```
+
+## Show your support
+
+Give a ⭐ if this project was helpful in any way!
