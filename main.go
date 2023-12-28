@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/bradford-hamilton/monkey-lang/ast"
@@ -39,7 +38,7 @@ func main() {
 		var result object.Object
 
 		filePath := flag.Args()[0]
-		contents, err := ioutil.ReadFile(filePath)
+		contents, err := os.ReadFile(filePath)
 		if err != nil {
 			fmt.Printf("Failure to read file '%s'. Err: %s", string(contents), err)
 		}

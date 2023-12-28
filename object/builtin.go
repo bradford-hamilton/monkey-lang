@@ -117,7 +117,7 @@ func bRest(args ...Object) Object {
 	array := args[0].(*Array)
 	length := len(array.Elements)
 	if length > 0 {
-		newElements := make([]Object, length-1, length-1)
+		newElements := make([]Object, length-1)
 		copy(newElements, array.Elements[1:length])
 		return &Array{Elements: newElements}
 	}
@@ -136,7 +136,7 @@ func bPush(args ...Object) Object {
 	array := args[0].(*Array)
 	length := len(array.Elements)
 
-	newElements := make([]Object, length+1, length+1)
+	newElements := make([]Object, length+1)
 	copy(newElements, array.Elements)
 	newElements[length] = args[1]
 
@@ -157,7 +157,7 @@ func bPop(args ...Object) Object {
 		return nil
 	}
 
-	newElements := make([]Object, length-1, length-1)
+	newElements := make([]Object, length-1)
 	copy(newElements, array.Elements[0:length-1])
 
 	return &Array{Elements: newElements}

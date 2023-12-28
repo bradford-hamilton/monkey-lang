@@ -186,7 +186,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		case "||":
 			c.emit(code.OpOr)
 		default:
-			return fmt.Errorf("Unknown operator %s", node.Operator)
+			return fmt.Errorf("unknown operator %s", node.Operator)
 		}
 
 	case *ast.IntegerLiteral:
@@ -212,13 +212,13 @@ func (c *Compiler) Compile(node ast.Node) error {
 		case "-":
 			c.emit(code.OpMinus)
 		default:
-			return fmt.Errorf("Unknown operator %s", node.Operator)
+			return fmt.Errorf("unknown operator %s", node.Operator)
 		}
 
 	case *ast.PostfixExpression:
 		symbol, ok := c.symbolTable.Resolve(node.TokenLiteral())
 		if !ok {
-			return fmt.Errorf("Undefined variable %s", node.TokenLiteral())
+			return fmt.Errorf("undefined variable %s", node.TokenLiteral())
 		}
 
 		if symbol.Scope == GlobalScope {
@@ -233,7 +233,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		case "--":
 			c.emit(code.OpMinusMinus)
 		default:
-			return fmt.Errorf("Unknown operator %s", node.Operator)
+			return fmt.Errorf("unknown operator %s", node.Operator)
 		}
 
 	case *ast.IfExpression:
@@ -320,7 +320,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 	case *ast.Identifier:
 		symbol, ok := c.symbolTable.Resolve(node.Value)
 		if !ok {
-			return fmt.Errorf("Undefined variable %s", node.Value)
+			return fmt.Errorf("undefined variable %s", node.Value)
 		}
 
 		c.loadSymbol(symbol)

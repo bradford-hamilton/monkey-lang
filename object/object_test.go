@@ -68,10 +68,10 @@ func TestIntegerHashKey(t *testing.T) {
 func TestHash(t *testing.T) {
 	h := &Hash{
 		Pairs: map[HashKey]HashPair{
-			HashKey{
+			{
 				Type:  StringObj,
 				Value: 1,
-			}: HashPair{
+			}: {
 				Key:   &String{Value: "monkey"},
 				Value: &String{Value: "lang"},
 			},
@@ -164,7 +164,7 @@ func TestErrors(t *testing.T) {
 func TestFunctions(t *testing.T) {
 	f := &Function{
 		Parameters: []*ast.Identifier{
-			&ast.Identifier{
+			{
 				Token: token.Token{
 					Type: token.String,
 				},
