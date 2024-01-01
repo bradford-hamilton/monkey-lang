@@ -344,7 +344,7 @@ func (vm *VM) executeBinaryOperation(op code.Opcode) error {
 		return vm.executeBinaryStringOperation(op, left, right)
 	}
 
-	return fmt.Errorf("Unsupported types for binary operation: %s %s", leftType, rightType)
+	return fmt.Errorf("unsupported types for binary operation: %s %s", leftType, rightType)
 }
 
 func (vm *VM) executeBinaryIntegerOperation(op code.Opcode, left, right object.Object) error {
@@ -365,7 +365,7 @@ func (vm *VM) executeBinaryIntegerOperation(op code.Opcode, left, right object.O
 	case code.OpMod:
 		result = leftValue % rightValue
 	default:
-		return fmt.Errorf("Unknown integer operator: %d", op)
+		return fmt.Errorf("unknown integer operator: %d", op)
 	}
 
 	return vm.push(&object.Integer{Value: result})
@@ -373,7 +373,7 @@ func (vm *VM) executeBinaryIntegerOperation(op code.Opcode, left, right object.O
 
 func (vm *VM) executeBinaryStringOperation(op code.Opcode, left, right object.Object) error {
 	if op != code.OpAdd {
-		return fmt.Errorf("Unknown String operator %d", op)
+		return fmt.Errorf("unknown String operator %d", op)
 	}
 
 	leftValue := left.(*object.String).Value
@@ -402,7 +402,7 @@ func (vm *VM) executeComparison(op code.Opcode) error {
 		}
 		return vm.push(nativeBoolToBooleanObj(right != left))
 	default:
-		return fmt.Errorf("Unknown operator: %d (%s %s)", op, left.Type(), right.Type())
+		return fmt.Errorf("unknown operator: %d (%s %s)", op, left.Type(), right.Type())
 	}
 }
 
@@ -435,7 +435,7 @@ func (vm *VM) executeIntegerComparison(op code.Opcode, left, right object.Object
 	case code.OpGreaterEqual:
 		return vm.push(nativeBoolToBooleanObj(leftValue >= rightValue))
 	default:
-		return fmt.Errorf("Unknown operator: %d", op)
+		return fmt.Errorf("unknown operator: %d", op)
 	}
 }
 
@@ -454,7 +454,6 @@ func coerceObjToNativeBool(o object.Object) bool {
 
 	switch obj := o.(type) {
 	case *object.Boolean:
-
 		return obj.Value
 	case *object.String:
 		return obj.Value != ""
@@ -490,7 +489,7 @@ func (vm *VM) executeMinusOperator() error {
 	operand := vm.pop()
 
 	if operand.Type() != object.IntegerObj {
-		return fmt.Errorf("Unsupported type for negation: %s", operand.Type())
+		return fmt.Errorf("unsupported type for negation: %s", operand.Type())
 	}
 
 	value := operand.(*object.Integer).Value
@@ -502,7 +501,7 @@ func (vm *VM) executePostfixOperator(op code.Opcode, ins code.Instructions, ip i
 	// Get the operand, must be an integer identifier
 	operand := vm.pop()
 	if operand.Type() != object.IntegerObj {
-		return fmt.Errorf("Invalid left-hand side expression in postfix operation: %s", operand.Type())
+		return fmt.Errorf("invalid left-hand side expression in postfix operation: %s", operand.Type())
 	}
 
 	// Increment or decrement the operand based on opcode
@@ -552,7 +551,7 @@ func (vm *VM) buildHash(startIndex, endIndex int) (object.Object, error) {
 
 		hashKey, ok := key.(object.Hashable)
 		if !ok {
-			return nil, fmt.Errorf("Unusable as a hash key: %s", key.Type())
+			return nil, fmt.Errorf("unusable as a hash key: %s", key.Type())
 		}
 
 		hashedPairs[hashKey.HashKey()] = pair
@@ -568,7 +567,7 @@ func (vm *VM) executeIndexExpr(left, index object.Object) error {
 	case left.Type() == object.HashObj:
 		return vm.executeHashIndex(left, index)
 	default:
-		return fmt.Errorf("Index operator not supported: %s", left.Type())
+		return fmt.Errorf("index operator not supported: %s", left.Type())
 	}
 }
 
@@ -589,7 +588,7 @@ func (vm *VM) executeHashIndex(hash, index object.Object) error {
 
 	key, ok := index.(object.Hashable)
 	if !ok {
-		return fmt.Errorf("Unusable as a hash key: %s", index.Type())
+		return fmt.Errorf("unusable as a hash key: %s", index.Type())
 	}
 
 	pair, ok := hashObject.Pairs[key.HashKey()]
@@ -608,13 +607,13 @@ func (vm *VM) executeCall(numArgs int) error {
 	case *object.Builtin:
 		return vm.callBuiltin(callee, numArgs)
 	default:
-		return fmt.Errorf("Calling non-function and non-builtin")
+		return fmt.Errorf("calling non-function and non-builtin")
 	}
 }
 
 func (vm *VM) callClosure(cl *object.Closure, numArgs int) error {
 	if numArgs != cl.Fn.NumParameters {
-		return fmt.Errorf("Wrong number of arguments. Expected: %d. Got: %d", cl.Fn.NumParameters, numArgs)
+		return fmt.Errorf("wrong number of arguments. Expected: %d. Got: %d", cl.Fn.NumParameters, numArgs)
 	}
 
 	frame := NewFrame(cl, vm.sp-numArgs)
@@ -629,7 +628,7 @@ func (vm *VM) pushClosure(constIndex int, numFree int) error {
 
 	function, ok := constant.(*object.CompiledFunction)
 	if !ok {
-		return fmt.Errorf("Not a function: %+v", constant)
+		return fmt.Errorf("not a function: %+v", constant)
 	}
 
 	free := make([]object.Object, numFree)
