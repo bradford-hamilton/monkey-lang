@@ -603,6 +603,18 @@ func TestHashIndexExpressions(t *testing.T) {
 			nil,
 		},
 		{
+			`func(){}(1)`,
+			"Line 0: Wrong number of arguments: expected 0, got 1",
+		},
+		{
+			`func(a){a}(0, 0, 0, 0, 0)`,
+			"Line 0: Wrong number of arguments: expected 1, got 5",
+		},
+		{
+			`func(a, b){a + b}()`,
+			"Line 0: Wrong number of arguments: expected 2, got 0",
+		},
+		{
 			`{5: 5}[5]`,
 			5,
 		},
@@ -621,6 +633,8 @@ func TestHashIndexExpressions(t *testing.T) {
 		integer, ok := tt.expected.(int)
 		if ok {
 			testIntegerObject(t, evaluated, int64(integer))
+		} else if errorMsg, ok := tt.expected.(string); ok {
+			testErrorObject(t, evaluated, errorMsg)
 		} else {
 			testNullObject(t, evaluated)
 		}
@@ -666,6 +680,20 @@ func testBooleanObject(t *testing.T, obj object.Object, expected bool) bool {
 	}
 	if result.Value != expected {
 		t.Errorf("object has wrong value. Expected: %t, Got: %t", result.Value, expected)
+		return false
+	}
+
+	return true
+}
+
+func testErrorObject(t *testing.T, obj object.Object, expected string) bool {
+	result, ok := obj.(*object.Error)
+	if !ok {
+		t.Errorf("object is not an Error. Got: %T (%+v)", obj, obj)
+		return false
+	}
+	if result.Message != expected {
+		t.Errorf("object has wrong value. Expected: %q, Got: %q", result.Message, expected)
 		return false
 	}
 

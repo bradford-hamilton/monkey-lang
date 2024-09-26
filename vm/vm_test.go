@@ -415,15 +415,15 @@ func TestCallingFunctionsWithWrongArguments(t *testing.T) {
 	tests := []vmTestCase{
 		{
 			input:    `func() { 1; }(1);`,
-			expected: `Wrong number of arguments. Expected: 0. Got: 1`,
+			expected: `wrong number of arguments. Expected: 0. Got: 1`,
 		},
 		{
 			input:    `func(a) { a; }();`,
-			expected: `Wrong number of arguments. Expected: 1. Got: 0`,
+			expected: `wrong number of arguments. Expected: 1. Got: 0`,
 		},
 		{
 			input:    `func(a, b) { a + b; }(1);`,
-			expected: `Wrong number of arguments. Expected: 2. Got: 1`,
+			expected: `wrong number of arguments. Expected: 2. Got: 1`,
 		},
 	}
 
