@@ -2,7 +2,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/bradford-hamilton/monkey-lang)](https://goreportcard.com/report/github.com/bradford-hamilton/monkey-lang)
 [![codecov](https://codecov.io/gh/bradford-hamilton/monkey-lang/branch/master/graph/badge.svg)](https://codecov.io/gh/bradford-hamilton/monkey-lang)
 [![GoDoc](https://godoc.org/github.com/bradford-hamilton/monkey-lang?status.svg)](https://godoc.org/github.com/bradford-hamilton/monkey-lang)
-[![Go 1.12.9](https://img.shields.io/badge/go-1.12.9-9cf.svg)](https://golang.org/dl/)
+[![Go 1.23.1](https://img.shields.io/badge/go-1.23.1-9cf.svg)](https://golang.org/dl/)
 
 # Monkey Lang
 
