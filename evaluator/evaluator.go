@@ -463,6 +463,9 @@ func evalExprs(exprs []ast.Expression, env *object.Environment) []object.Object 
 func applyFunction(function object.Object, args []object.Object, line int) object.Object {
 	switch fn := function.(type) {
 	case *object.Function:
+		if len(args) != len(fn.Parameters) {
+			return newError("Line %d: Wrong number of arguments: expected %d, got %d", line, len(fn.Parameters), len(args))
+		}
 		extendedEnv := extendFunctionEnv(fn, args)
 		evaluated := Eval(fn.Body, extendedEnv)
 		return unwrapReturnValue(evaluated)
@@ -478,11 +481,9 @@ func applyFunction(function object.Object, args []object.Object, line int) objec
 
 func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Environment {
 	env := object.NewEnclosedEnvironment(fn.Env)
-
 	for i, param := range fn.Parameters {
 		env.Set(param.Value, args[i])
 	}
-
 	return env
 }
 
