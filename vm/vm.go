@@ -32,12 +32,13 @@ var Null = &object.Null{}
 // VM defines our Virtual Machine. It holds our constant pool, instructions, a stack, and an integer (index)
 // that points to the next free slot in the stack
 type VM struct {
-	constants   []object.Object
-	stack       []object.Object
-	sp          int // Stack pointer: always points to the next free slot in the stack. Top of stack is stack[ip-1]
-	globals     []object.Object
-	frames      []*Frame
-	framesIndex int
+	constants     []object.Object
+	stack         []object.Object
+	sp            int // Stack pointer: always points to the next free slot in the stack. Top of stack is stack[ip-1]
+	globals       []object.Object
+	frames        []*Frame
+	framesIndex   int
+	maxFramesUsed int // maximum stack tops used
 }
 
 // New initializers and returns a pointer to a VM. It takes bytecode and sets the bytecode's instructions
@@ -67,6 +68,7 @@ func (vm *VM) currentFrame() *Frame {
 func (vm *VM) pushFrame(f *Frame) {
 	vm.frames[vm.framesIndex] = f
 	vm.framesIndex++
+	vm.maxFramesUsed++
 }
 
 func (vm *VM) popFrame() *Frame {
@@ -615,10 +617,17 @@ func (vm *VM) callClosure(cl *object.Closure, numArgs int) error {
 	if numArgs != cl.Fn.NumParameters {
 		return fmt.Errorf("wrong number of arguments. Expected: %d. Got: %d", cl.Fn.NumParameters, numArgs)
 	}
-
-	frame := NewFrame(cl, vm.sp-numArgs)
-	vm.pushFrame(frame)
-	vm.sp = frame.basePointer + cl.Fn.NumLocals
+	if vm.framesIndex < vm.maxFramesUsed {
+		vm.frames[vm.framesIndex].basePointer = vm.sp - numArgs
+		vm.frames[vm.framesIndex].ip = -1
+		vm.frames[vm.framesIndex].closure = cl
+		vm.framesIndex++
+		vm.sp = vm.sp - numArgs + cl.Fn.NumLocals
+	} else {
+		frame := NewFrame(cl, vm.sp-numArgs)
+		vm.pushFrame(frame)
+		vm.sp = frame.basePointer + cl.Fn.NumLocals
+	}
 
 	return nil
 }
